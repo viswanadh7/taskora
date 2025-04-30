@@ -1,0 +1,84 @@
+import TaskCard from '@/components/TaskCard';
+import React, { useEffect, useState } from 'react';
+import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { router } from 'expo-router';
+import { collection, deleteDoc, doc, getDocs } from 'firebase/firestore';
+import { firebaseDB } from '@/config/firebase';
+import dayjs from 'dayjs';
+
+type TTaskList = {
+    id: string;
+    title?: string;
+    description?: string;
+    date?: string;
+    time?: string;
+    isCompleted?: boolean;
+};
+const tasks = () => {
+    const [taskList, setTaskList] = useState<TTaskList[]>();
+    const getTasks = async () => {
+        try {
+            const querySnapshot = await getDocs(
+                collection(firebaseDB, 'tasks')
+            );
+            const tasks = querySnapshot.docs.map((doc) => ({
+                id: doc.id,
+                ...doc.data(),
+            }));
+            console.log('tasks from db', tasks);
+            setTaskList(tasks);
+            // return tasks;
+        } catch (e) {
+            console.error('Error fetching tasks: ', e);
+        }
+    };
+    const deleteTask = async (id: string) => {
+        await deleteDoc(doc(firebaseDB, 'tasks', id));
+        getTasks();
+    };
+    useEffect(() => {
+        getTasks();
+    }, []);
+
+    return (
+        <View className="h-full">
+            <View className="flex flex-row justify-around gap-5 py-4 bg-white border-b shadow-xl">
+                <TouchableOpacity className="h-10 w-28 border rounded-lg">
+                    <Text className="text-center my-auto">All</Text>
+                </TouchableOpacity>
+                <TouchableOpacity className="h-10 w-28 border rounded-lg">
+                    <Text className="text-center my-auto">In Progress</Text>
+                </TouchableOpacity>
+                <TouchableOpacity className="h-10 w-28 border rounded-lg">
+                    <Text className="text-center my-auto">Completed</Text>
+                </TouchableOpacity>
+            </View>
+            <ScrollView className="p-2">
+                {taskList?.map((task, index) => (
+                    <TaskCard
+                        taskId={task.id}
+                        taskTitle={task.title!}
+                        description={task.description!}
+                        remainderAt={`${dayjs(task.date).format(
+                            'DD MMMM, YYYY'
+                        )} ${dayjs(task.time).format('hh:mm A')}`}
+                        isCompleted={task.isCompleted!}
+                        key={index}
+                        onDelete={deleteTask}
+                    />
+                ))}
+            </ScrollView>
+            <View className="absolute bottom-6 right-6 z-50">
+                <TouchableOpacity
+                    onPress={() => router.push('/taskForm')}
+                    className="bg-blue-600 p-4 rounded-full shadow-lg"
+                >
+                    <Ionicons name="add" size={24} color="white" />
+                </TouchableOpacity>
+            </View>
+        </View>
+    );
+};
+
+export default tasks;
