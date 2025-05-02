@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
     Button,
     Platform,
@@ -14,8 +14,11 @@ import { firebaseDB } from '@/config/firebase';
 import { router } from 'expo-router';
 
 const index = () => {
-    const [date, setDate] = useState(new Date());
-    const [time, setTime] = useState(new Date());
+    const dateTime = useRef<{ date: Date; time: Date }>({
+        date: new Date(),
+        time: new Date(),
+    });
+    console.log(dateTime.current);
     const [showDate, setShowDate] = useState(false);
     const [showTime, setShowTime] = useState(false);
 
@@ -24,17 +27,28 @@ const index = () => {
         description: string;
         date: Date;
         time: Date;
+        isCompleted: boolean;
     }>({
         title: '',
         description: '',
-        date: date,
-        time: time,
+        date: dateTime.current.date,
+        time: dateTime.current.time,
+        isCompleted: false,
     });
 
     const addTask = async () => {
+        console.log('new task: ', {
+            ...task,
+            date: dateTime.current.date,
+            time: dateTime.current.time,
+        });
         try {
-            await addDoc(collection(firebaseDB, 'tasks'), task);
-            router.push('/(tabs)/tasks')
+            await addDoc(collection(firebaseDB, 'tasks'), {
+                ...task,
+                date: dayjs(dateTime.current.date).format('DD MMMM, YYYY'),
+                time: dayjs(dateTime.current.time).format('hh:mm A'),
+            });
+            router.push('/(tabs)/tasks');
         } catch (e) {
             console.error('Error adding task: ', e);
         }
@@ -59,7 +73,9 @@ const index = () => {
                     <Text>Date:</Text>
                     <TouchableOpacity onPress={() => setShowDate(true)}>
                         <Text className="underline">
-                            {dayjs(date).format('DD MMMM, YYYY')}
+                            {dayjs(dateTime.current.date).format(
+                                'DD MMMM, YYYY'
+                            )}
                         </Text>
                     </TouchableOpacity>
                 </View>
@@ -67,30 +83,30 @@ const index = () => {
                     <Text>Time:</Text>
                     <TouchableOpacity onPress={() => setShowTime(true)}>
                         <Text className="underline">
-                            {dayjs(time).format('hh:mm A')}
+                            {dayjs(dateTime.current.time).format('hh:mm A')}
                         </Text>
                     </TouchableOpacity>
                 </View>
             </View>
             {showDate && (
                 <DateTimePicker
-                    value={date}
+                    value={dateTime.current.date}
                     mode="date"
                     display="default"
                     onChange={(e, date) => {
-                        setDate(date as Date);
+                        dateTime.current.date = date as Date;
                         setShowDate(false);
                     }}
                 />
             )}
             {showTime && (
                 <DateTimePicker
-                    value={time}
+                    value={dateTime.current.time}
                     mode="time"
                     display="default"
                     is24Hour={false}
                     onChange={(e, time) => {
-                        setTime(time as Date);
+                        dateTime.current.time = time as Date;
                         setShowTime(false);
                     }}
                 />

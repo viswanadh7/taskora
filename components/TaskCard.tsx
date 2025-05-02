@@ -1,6 +1,7 @@
 import React from 'react';
 import { Image, Text, TouchableOpacity, View } from 'react-native';
 import { Feather, MaterialIcons } from '@expo/vector-icons';
+import { TTask } from '@/app/(tabs)/tasks';
 
 type TTaskCard = {
     taskId: string;
@@ -9,6 +10,7 @@ type TTaskCard = {
     remainderAt: string;
     isCompleted: boolean;
     onDelete: (taskId: string) => void;
+    onStatusChange: (taskId: string, task: TTask) => void;
 };
 const TaskCard = ({
     taskId,
@@ -17,17 +19,28 @@ const TaskCard = ({
     remainderAt,
     isCompleted,
     onDelete,
+    onStatusChange,
 }: TTaskCard) => {
     return (
         <View className="p-2 border rounded-lg bg-white shadow my-2 overflow-hidden">
             <View className="flex flex-row items-center gap-8">
-                <View>
+                <TouchableOpacity
+                    onPress={() =>
+                        onStatusChange(taskId, {
+                            id: taskId,
+                            title: taskTitle,
+                            description,
+                            // remainderAt,
+                            isCompleted: !isCompleted,
+                        })
+                    }
+                >
                     {isCompleted ? (
                         <Feather name="check-circle" size={35} color="black" />
                     ) : (
                         <Feather name="circle" size={35} color="black" />
                     )}
-                </View>
+                </TouchableOpacity>
                 <View>
                     <Text className="text-2xl">{taskTitle}</Text>
                     <Text className="my-2 max-w-[80%]">{description}</Text>
@@ -52,10 +65,12 @@ const TaskCard = ({
                 </TouchableOpacity>
             </View>
             {isCompleted && (
-                <Image
+                <View
                     className="absolute min-h-full min-w-full opacity-50"
-                    source={require('../assets/images/strikes2.jpg')}
-                />
+                    pointerEvents="none"
+                >
+                    <Image source={require('../assets/images/strikes2.jpg')} />
+                </View>
             )}
         </View>
     );
