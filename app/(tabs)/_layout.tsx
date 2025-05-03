@@ -6,18 +6,32 @@ import {
     SimpleLineIcons,
     FontAwesome5,
 } from '@expo/vector-icons';
+import { colorPalette } from '@/styles/colors';
 
 const TabLayout = () => {
     return (
-        <Tabs initialRouteName="index">
+        <Tabs
+            initialRouteName="index"
+            screenOptions={{
+                tabBarStyle: {
+                    height: 55,
+                },
+                tabBarActiveTintColor: colorPalette.primary,
+                tabBarLabelStyle: {
+                    fontSize: 13,
+                },
+            }}
+        >
             <Tabs.Screen
                 name="notes"
                 options={{
                     headerShown: false,
                     title: 'Notes',
                     tabBarIcon: ({ focused }) => (
-                         <SimpleLineIcons name="notebook" size={24}
-                            color={focused ? 'blue' : 'black'}
+                        <SimpleLineIcons
+                            name="notebook"
+                            size={focused ? 28 : 24}
+                            color={focused ? colorPalette.primary : 'black'}
                         />
                     ),
                 }}
@@ -30,8 +44,8 @@ const TabLayout = () => {
                     tabBarIcon: ({ focused }) => (
                         <FontAwesome5
                             name="tasks"
-                            size={24}
-                            color={focused ? 'blue' : 'black'}
+                            size={focused ? 28 : 24}
+                            color={focused ? colorPalette.primary : 'black'}
                         />
                     ),
                 }}
@@ -44,8 +58,8 @@ const TabLayout = () => {
                     tabBarIcon: ({ focused }) => (
                         <AntDesign
                             name="home"
-                            size={24}
-                            color={focused ? 'blue' : 'black'}
+                            size={focused ? 28 : 24}
+                            color={focused ? colorPalette.primary : 'black'}
                         />
                     ),
                 }}
@@ -58,8 +72,8 @@ const TabLayout = () => {
                     tabBarIcon: ({ focused }) => (
                         <MaterialCommunityIcons
                             name="bookshelf"
-                            size={24}
-                            color={focused ? 'blue' : 'black'}
+                            size={focused ? 28 : 24}
+                            color={focused ? colorPalette.primary : 'black'}
                         />
                     ),
                 }}
@@ -72,8 +86,8 @@ const TabLayout = () => {
                     tabBarIcon: ({ focused }) => (
                         <MaterialCommunityIcons
                             name="account-outline"
-                            size={24}
-                            color={focused ? 'blue' : 'black'}
+                            size={focused ? 28 : 24}
+                            color={focused ? colorPalette.primary : 'black'}
                         />
                     ),
                 }}
