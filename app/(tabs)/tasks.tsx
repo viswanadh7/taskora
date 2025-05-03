@@ -41,7 +41,6 @@ const tasks = () => {
             }));
             console.log('tasks from db', tasks);
             setTaskList(tasks);
-            // return tasks;
         } catch (e) {
             console.error('Error fetching tasks: ', e);
         } finally {
@@ -96,7 +95,7 @@ const tasks = () => {
             <View className="absolute bottom-6 right-6 z-50">
                 <TouchableOpacity
                     onPress={() => router.push('/taskForm')}
-                    className="bg-blue-600 p-4 rounded-full shadow-lg"
+                    className="bg-primary p-4 rounded-full shadow-lg"
                 >
                     <Ionicons name="add" size={24} color="white" />
                 </TouchableOpacity>
