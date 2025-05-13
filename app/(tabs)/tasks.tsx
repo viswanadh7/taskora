@@ -17,15 +17,10 @@ import {
     updateDoc,
 } from 'firebase/firestore';
 import { firebaseDB } from '@/config/firebase';
+import { schedulePushNotification } from '@/components/Notify';
+import dayjs from 'dayjs';
+import { TTask } from '@/common-types/componentTypes';
 
-export type TTask = {
-    id: string;
-    title?: string;
-    description?: string;
-    date?: string;
-    time?: string;
-    isCompleted?: boolean;
-};
 const tasks = () => {
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [taskList, setTaskList] = useState<TTask[]>();
@@ -60,6 +55,28 @@ const tasks = () => {
         getTasks();
     }, []);
 
+    useEffect(() => {
+        taskList?.forEach(async (task) => {
+            if (task.remainderAt) {
+                const remainderDate = dayjs(
+                    task.remainderAt,
+                    'DD MMMM, YYYY hh:mm A'
+                );
+
+                const now = new Date();
+                const remainderTime = remainderDate.toDate();
+
+                if (remainderTime > now) {
+                    await schedulePushNotification(
+                        task.title!,
+                        task.description!,
+                        remainderTime
+                    );
+                }
+            }
+        });
+    }, [taskList]);
+
     return (
         <View className="h-full">
             {/* <View className="flex flex-row justify-around gap-5 py-4 bg-white border-b shadow-xl">
@@ -77,18 +94,20 @@ const tasks = () => {
                 <ActivityIndicator size="large" />
             ) : (
                 <ScrollView className="p-2">
-                    {taskList?.map((task, index) => (
-                        <TaskCard
-                            taskId={task.id}
-                            taskTitle={task.title!}
-                            description={task.description!}
-                            remainderAt={`${task.date} ${task.time}`}
-                            isCompleted={task.isCompleted!}
-                            key={index}
-                            onDelete={deleteTask}
-                            onStatusChange={changeTaskStatus}
-                        />
-                    ))}
+                    {taskList?.length ? (
+                        taskList?.map((task, index) => (
+                            <TaskCard
+                                key={index}
+                                task={task}
+                                onDelete={deleteTask}
+                                onStatusChange={changeTaskStatus}
+                            />
+                        ))
+                    ) : (
+                        <View>
+                            <Text>No tasks. Add to a new task</Text>
+                        </View>
+                    )}
                 </ScrollView>
             )}
 

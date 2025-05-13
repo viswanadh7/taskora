@@ -25,28 +25,24 @@ const index = () => {
     const [task, setTask] = useState<{
         title: string;
         description: string;
-        date: Date;
-        time: Date;
+        remainderAt: string;
         isCompleted: boolean;
     }>({
         title: '',
         description: '',
-        date: dateTime.current.date,
-        time: dateTime.current.time,
+        remainderAt: `${dayjs(dateTime.current.date).format(
+            'DD MMMM, YYYY'
+        )} ${dayjs(dateTime.current.time).format('hh:mm A')}`,
         isCompleted: false,
     });
 
     const addTask = async () => {
-        console.log('new task: ', {
-            ...task,
-            date: dateTime.current.date,
-            time: dateTime.current.time,
-        });
         try {
             await addDoc(collection(firebaseDB, 'tasks'), {
                 ...task,
-                date: dayjs(dateTime.current.date).format('DD MMMM, YYYY'),
-                time: dayjs(dateTime.current.time).format('hh:mm A'),
+                remainderAt: `${dayjs(dateTime.current.date).format(
+                    'DD MMMM, YYYY'
+                )} ${dayjs(dateTime.current.time).format('hh:mm A')}`,
             });
             router.push('/(tabs)/tasks');
         } catch (e) {
@@ -64,13 +60,14 @@ const index = () => {
             <View className="px-4 pt-10 h-[80%] rounded-t-3xl bg-white mt-auto">
                 <Text className="mt-4 text-xl">Task title</Text>
                 <TextInput
-                    className="border border-black/30 rounded-lg py-3 text-xl"
+                    className="border border-black/30 rounded-lg py-3 pl-2 text-xl"
                     placeholder="Enter the task title"
                     onChangeText={(e) => setTask({ ...task, title: e })}
                 />
                 <Text className="mt-4 text-xl">Description</Text>
                 <TextInput
-                    className="border border-black/30 rounded-lg py-3 text-xl"
+                    multiline
+                    className="border border-black/30 rounded-lg py-3 pl-2 text-xl max-h-60"
                     placeholder="Enter few words of description..."
                     onChangeText={(e) => setTask({ ...task, description: e })}
                 />

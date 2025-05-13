@@ -1,23 +1,15 @@
 import React from 'react';
 import { Image, Text, TouchableOpacity, View } from 'react-native';
 import { Feather, MaterialIcons } from '@expo/vector-icons';
-import { TTask } from '@/app/(tabs)/tasks';
+import { TTask } from '@/common-types/componentTypes';
 
 type TTaskCard = {
-    taskId: string;
-    taskTitle: string;
-    description: string;
-    remainderAt: string;
-    isCompleted: boolean;
-    onDelete: (taskId: string) => void;
-    onStatusChange: (taskId: string, task: TTask) => void;
+    task: TTask;
+    onDelete: (id: string) => void;
+    onStatusChange: (id: string, task: TTask) => void;
 };
 const TaskCard = ({
-    taskId,
-    taskTitle,
-    description,
-    remainderAt,
-    isCompleted,
+    task: { id, title, description, remainderAt, isCompleted },
     onDelete,
     onStatusChange,
 }: TTaskCard) => {
@@ -26,9 +18,9 @@ const TaskCard = ({
             <View className="flex flex-row items-center gap-8">
                 <TouchableOpacity
                     onPress={() =>
-                        onStatusChange(taskId, {
-                            id: taskId,
-                            title: taskTitle,
+                        onStatusChange(id, {
+                            id: id,
+                            title: title,
                             description,
                             // remainderAt,
                             isCompleted: !isCompleted,
@@ -38,12 +30,16 @@ const TaskCard = ({
                     {isCompleted ? (
                         <Feather name="check-circle" size={35} color="black" />
                     ) : (
-                        <Feather name="circle" size={35} color="black" />
+                        <MaterialIcons
+                            name="check-box-outline-blank"
+                            size={35}
+                            color="black"
+                        />
                     )}
                 </TouchableOpacity>
                 <View>
-                    <Text className="text-2xl">{taskTitle}</Text>
-                    <Text className="my-2 max-w-[80%]">{description}</Text>
+                    <Text className="text-2xl">{title}</Text>
+                    <Text className="my-2 max-w-[80%] max-h-10">{description}</Text>
                     <View className="flex flex-row items-center gap-3">
                         <MaterialIcons
                             name="access-alarm"
@@ -54,13 +50,13 @@ const TaskCard = ({
                     </View>
                 </View>
                 <TouchableOpacity
-                    onPress={() => onDelete(taskId)}
+                    onPress={() => onDelete(id)}
                     className="absolute right-1"
                 >
                     <MaterialIcons
                         name="delete-outline"
                         size={35}
-                        color="black"
+                        color="#c70000"
                     />
                 </TouchableOpacity>
             </View>
