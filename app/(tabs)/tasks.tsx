@@ -1,59 +1,75 @@
 import TaskCard from '@/components/TaskCard';
 import React, { useEffect, useState } from 'react';
-import {
-    ActivityIndicator,
-    ScrollView,
-    Text,
-    TouchableOpacity,
-    View,
-} from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { router } from 'expo-router';
+import { ScrollView, Text, View } from 'react-native';
 import {
     collection,
     deleteDoc,
     doc,
     getDocs,
+    onSnapshot,
     updateDoc,
 } from 'firebase/firestore';
 import { firebaseDB } from '@/config/firebase';
 import { schedulePushNotification } from '@/components/Notify';
 import dayjs from 'dayjs';
-import { TTask } from '@/common-types/componentTypes';
+import { TTask } from '@/types/componentTypes';
+import { useGlobalState } from '@/hooks/useGlobalState';
+import TaskLoading from '@/components/TaskLoading';
+import AddButton from '@/components/AddButton';
+import { router } from 'expo-router';
 
 const tasks = () => {
     const [isLoading, setIsLoading] = useState<boolean>(false);
-    const [taskList, setTaskList] = useState<TTask[]>();
-    const getTasks = async () => {
+    const { taskList, setTaskList } = useGlobalState();
+
+    useEffect(() => {
         setIsLoading(true);
-        try {
-            const querySnapshot = await getDocs(
-                collection(firebaseDB, 'tasks')
-            );
-            const tasks = querySnapshot.docs.map((doc) => ({
-                id: doc.id,
-                ...doc.data(),
-            }));
-            console.log('tasks from db', tasks);
-            setTaskList(tasks);
-        } catch (e) {
-            console.error('Error fetching tasks: ', e);
-        } finally {
-            setIsLoading(false);
-        }
-    };
+        const unsubscribe = onSnapshot(
+            collection(firebaseDB, 'tasks'),
+            (snapshot) => {
+                const updatedTasks = snapshot.docs.map((doc) => ({
+                    id: doc.id,
+                    ...doc.data(),
+                }));
+                setTaskList(updatedTasks);
+                setIsLoading(false);
+            },
+            (error) => console.log(error)
+        );
+
+        // Cleanup listener on unmount
+        return () => unsubscribe();
+    }, []);
+    // const getTasks = async () => {
+    //     setIsLoading(true);
+    //     try {
+    //         const querySnapshot = await getDocs(
+    //             collection(firebaseDB, 'tasks')
+    //         );
+    //         const tasks = querySnapshot.docs.map((doc) => ({
+    //             id: doc.id,
+    //             ...doc.data(),
+    //         }));
+    //         console.log('tasks from db', tasks);
+    //         setTaskList(tasks);
+    //     } catch (e) {
+    //         console.error('Error fetching tasks: ', e);
+    //     } finally {
+    //         setIsLoading(false);
+    //     }
+    // };
     const changeTaskStatus = async (id: string, updatedTask: TTask) => {
         const task = doc(firebaseDB, 'tasks', id);
         await updateDoc(task, updatedTask);
-        getTasks();
+        // getTasks();
     };
     const deleteTask = async (id: string) => {
         await deleteDoc(doc(firebaseDB, 'tasks', id));
-        getTasks();
+        // getTasks();
     };
-    useEffect(() => {
-        getTasks();
-    }, []);
+    // useEffect(() => {
+    //     getTasks();
+    // }, []);
 
     useEffect(() => {
         taskList?.forEach(async (task) => {
@@ -91,7 +107,11 @@ const tasks = () => {
                 </TouchableOpacity>
             </View> */}
             {isLoading ? (
-                <ActivityIndicator size="large" />
+                <View className="p-2">
+                    <TaskLoading />
+                    <TaskLoading />
+                    <TaskLoading />
+                </View>
             ) : (
                 <ScrollView className="p-2">
                     {taskList?.length ? (
@@ -101,6 +121,15 @@ const tasks = () => {
                                 task={task}
                                 onDelete={deleteTask}
                                 onStatusChange={changeTaskStatus}
+                                onPress={() => {
+                                    router.push({
+                                        pathname: '/taskDetails/[taskId]',
+                                        params: {
+                                            taskId: task.id,
+                                            title: task.title,
+                                        },
+                                    });
+                                }}
                             />
                         ))
                     ) : (
@@ -110,15 +139,7 @@ const tasks = () => {
                     )}
                 </ScrollView>
             )}
-
-            <View className="absolute bottom-6 right-6 z-50">
-                <TouchableOpacity
-                    onPress={() => router.push('/taskForm')}
-                    className="bg-primary p-4 rounded-full shadow-lg"
-                >
-                    <Ionicons name="add" size={24} color="white" />
-                </TouchableOpacity>
-            </View>
+            <AddButton onPress={() => router.push('/taskForm')} />
         </View>
     );
 };
