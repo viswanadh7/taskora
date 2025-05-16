@@ -1,20 +1,25 @@
 import React from 'react';
 import { Image, Text, TouchableOpacity, View } from 'react-native';
 import { Feather, MaterialIcons } from '@expo/vector-icons';
-import { TTask } from '@/common-types/componentTypes';
+import { TTask } from '@/types/componentTypes';
 
 type TTaskCard = {
     task: TTask;
     onDelete: (id: string) => void;
     onStatusChange: (id: string, task: TTask) => void;
+    onPress: VoidFunction;
 };
 const TaskCard = ({
     task: { id, title, description, remainderAt, isCompleted },
     onDelete,
     onStatusChange,
+    onPress,
 }: TTaskCard) => {
     return (
-        <View className="p-2 border rounded-lg bg-white shadow my-2 overflow-hidden">
+        <TouchableOpacity
+            onPress={onPress}
+            className="p-2 border rounded-lg bg-white shadow my-2 overflow-hidden"
+        >
             <View className="flex flex-row items-center gap-8">
                 <TouchableOpacity
                     onPress={() =>
@@ -39,7 +44,9 @@ const TaskCard = ({
                 </TouchableOpacity>
                 <View>
                     <Text className="text-2xl">{title}</Text>
-                    <Text className="my-2 max-w-[80%] max-h-10">{description}</Text>
+                    <Text className="my-2 max-w-[80%] max-h-10">
+                        {description}
+                    </Text>
                     <View className="flex flex-row items-center gap-3">
                         <MaterialIcons
                             name="access-alarm"
@@ -68,7 +75,7 @@ const TaskCard = ({
                     <Image source={require('../assets/images/strikes2.jpg')} />
                 </View>
             )}
-        </View>
+        </TouchableOpacity>
     );
 };
 
