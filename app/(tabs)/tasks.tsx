@@ -5,7 +5,6 @@ import {
     collection,
     deleteDoc,
     doc,
-    getDocs,
     onSnapshot,
     updateDoc,
 } from 'firebase/firestore';
@@ -17,6 +16,9 @@ import { useGlobalState } from '@/hooks/useGlobalState';
 import TaskLoading from '@/components/TaskLoading';
 import AddButton from '@/components/AddButton';
 import { router } from 'expo-router';
+
+import customParseFormat from 'dayjs/plugin/customParseFormat';
+dayjs.extend(customParseFormat);
 
 const tasks = () => {
     const [isLoading, setIsLoading] = useState<boolean>(false);

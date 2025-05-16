@@ -10,6 +10,8 @@ export default function Home() {
             shouldShowAlert: true, // 👈 shows alert in foreground
             shouldPlaySound: true,
             shouldSetBadge: false,
+            shouldShowBanner: true,
+            shouldShowList: true,
         }),
     });
     const [expoPushToken, setExpoPushToken] = useState('');
