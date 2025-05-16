@@ -1,24 +1,17 @@
-import React, { useEffect, useRef, useState } from 'react';
-import {
-    Button,
-    Platform,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
-} from 'react-native';
+import React, { useRef, useState } from 'react';
+import { Text, TextInput, TouchableOpacity, View } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import dayjs from 'dayjs';
-import { addDoc, collection, getDocs } from 'firebase/firestore';
+import { addDoc, collection } from 'firebase/firestore';
 import { firebaseDB } from '@/config/firebase';
-import { router } from 'expo-router';
+import { useNavigation } from 'expo-router';
 
 const index = () => {
     const dateTime = useRef<{ date: Date; time: Date }>({
         date: new Date(),
         time: new Date(),
     });
-    console.log(dateTime.current);
+    const navigation = useNavigation();
     const [showDate, setShowDate] = useState(false);
     const [showTime, setShowTime] = useState(false);
 
@@ -44,7 +37,7 @@ const index = () => {
                     'DD MMMM, YYYY'
                 )} ${dayjs(dateTime.current.time).format('hh:mm A')}`,
             });
-            router.push('/(tabs)/tasks');
+            navigation.goBack();
         } catch (e) {
             console.error('Error adding task: ', e);
         }
