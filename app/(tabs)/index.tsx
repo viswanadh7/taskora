@@ -5,10 +5,10 @@ import React from 'react';
 import { ScrollView, Text, View } from 'react-native';
 
 const index = () => {
-    const { taskList, notesList } = useGlobalState();
+    const { taskList, notesList, userDetails } = useGlobalState();
     return (
         <ScrollView className="p-2">
-            <Text className="text-2xl">Hi User!</Text>
+            <Text className="text-2xl">Hi {userDetails?.name}!</Text>
             <View className="flex flex-row flex-wrap justify-between gap-2">
                 <HomeCard
                     title="No.of tasks"

@@ -10,10 +10,13 @@ import {
     deleteDoc,
     doc,
     onSnapshot,
+    query,
     updateDoc,
+    where,
 } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
 import {
+    ActivityIndicator,
     ScrollView,
     Text,
     TouchableOpacity,
@@ -22,21 +25,25 @@ import {
 } from 'react-native';
 
 const notes = () => {
-    const { notesList, setNotesList } = useGlobalState();
+    const { notesList, setNotesList, userDetails } = useGlobalState();
     const [selected, setSelected] = useState<string[]>([]);
-    console.log('selected', selected);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
     useEffect(() => {
-        const unSubscribe = onSnapshot(
-            collection(firebaseDB, 'notes'),
-            (snapshot) => {
-                const updatedNotes = snapshot.docs.map((item) => ({
-                    id: item.id,
-                    ...item.data(),
-                }));
-                setNotesList(updatedNotes);
-                setSelected([]);
-            }
-        );
+        setIsLoading(true);
+
+        const notesCollectionRef = collection(firebaseDB, 'notes');
+        const whereCondition = where('userId', '==', userDetails?.id);
+        const notesQuery = query(notesCollectionRef, whereCondition);
+
+        const unSubscribe = onSnapshot(notesQuery, (snapshot) => {
+            const updatedNotes = snapshot.docs.map((item) => ({
+                id: item.id,
+                ...item.data(),
+            }));
+            setNotesList(updatedNotes);
+            setSelected([]);
+            setIsLoading(false);
+        });
         return () => unSubscribe();
     }, []);
 
@@ -84,6 +91,9 @@ const notes = () => {
             }
         }
     };
+    if (isLoading) {
+        return <ActivityIndicator size="large" />;
+    }
 
     return (
         <View className="h-full">

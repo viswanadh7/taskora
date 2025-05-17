@@ -6,7 +6,9 @@ import {
     deleteDoc,
     doc,
     onSnapshot,
+    query,
     updateDoc,
+    where,
 } from 'firebase/firestore';
 import { firebaseDB } from '@/config/firebase';
 import { schedulePushNotification } from '@/components/Notify';
@@ -22,12 +24,17 @@ dayjs.extend(customParseFormat);
 
 const tasks = () => {
     const [isLoading, setIsLoading] = useState<boolean>(false);
-    const { taskList, setTaskList } = useGlobalState();
+    const { taskList, setTaskList, userDetails } = useGlobalState();
 
     useEffect(() => {
         setIsLoading(true);
+
+        const taskCollectionRef = collection(firebaseDB, 'tasks');
+        const whereCondition = where('userId', '==', userDetails?.id);
+        const taskQuery = query(taskCollectionRef, whereCondition);
+
         const unsubscribe = onSnapshot(
-            collection(firebaseDB, 'tasks'),
+            taskQuery,
             (snapshot) => {
                 const updatedTasks = snapshot.docs.map((doc) => ({
                     id: doc.id,

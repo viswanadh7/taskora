@@ -18,10 +18,11 @@ const index = () => {
     const navigation = useNavigation();
 
     const { notesId } = useGlobalSearchParams();
-    const { notesList } = useGlobalState();
+    const { notesList, userDetails } = useGlobalState();
     const currentNotes = notesList.find((item) => item.id === notesId);
 
     const [note, setNote] = useState<TNewNotesForm>({
+        userId: userDetails?.id as string,
         title: currentNotes?.title ?? '',
         noteData: currentNotes?.noteData ?? '',
         updatedOn: new Date(),

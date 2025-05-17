@@ -7,6 +7,7 @@ import { firebaseDB } from '@/config/firebase';
 import { useNavigation } from 'expo-router';
 import { TNewTaskForm } from '@/types/commonTypes';
 import { formateDateTime } from '@/utils/formate-datetime';
+import { useGlobalState } from '@/hooks/useGlobalState';
 
 const index = () => {
     const dateTime = useRef<{ date: Date; time: Date }>({
@@ -15,11 +16,13 @@ const index = () => {
     });
 
     const navigation = useNavigation();
+    const { userDetails } = useGlobalState();
 
     const [showDate, setShowDate] = useState(false);
     const [showTime, setShowTime] = useState(false);
 
     const [task, setTask] = useState<TNewTaskForm>({
+        userId: userDetails?.id as string,
         title: '',
         description: '',
         remainderAt: formateDateTime(

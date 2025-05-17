@@ -1,4 +1,5 @@
 export type TNewTaskForm = {
+    userId: string;
     title: string;
     description: string;
     remainderAt: string;
@@ -15,9 +16,17 @@ export type TNotes = {
 };
 
 export type TNewNotesForm = {
+    userId: string;
     title: string;
     noteData: string;
     updatedOn: Date;
     colorCode: string;
     isLocked: boolean;
+};
+
+export type TUserDetails = {
+    id: string;
+    username?: string;
+    name?: string;
+    password?: string;
 };
