@@ -5,27 +5,27 @@ import dayjs from 'dayjs';
 import { addDoc, collection } from 'firebase/firestore';
 import { firebaseDB } from '@/config/firebase';
 import { useNavigation } from 'expo-router';
+import { TNewTaskForm } from '@/types/commonTypes';
+import { formateDateTime } from '@/utils/formate-datetime';
 
 const index = () => {
     const dateTime = useRef<{ date: Date; time: Date }>({
         date: new Date(),
         time: new Date(),
     });
+
     const navigation = useNavigation();
+
     const [showDate, setShowDate] = useState(false);
     const [showTime, setShowTime] = useState(false);
 
-    const [task, setTask] = useState<{
-        title: string;
-        description: string;
-        remainderAt: string;
-        isCompleted: boolean;
-    }>({
+    const [task, setTask] = useState<TNewTaskForm>({
         title: '',
         description: '',
-        remainderAt: `${dayjs(dateTime.current.date).format(
-            'DD MMMM, YYYY'
-        )} ${dayjs(dateTime.current.time).format('hh:mm A')}`,
+        remainderAt: formateDateTime(
+            dateTime.current.date,
+            dateTime.current.time
+        ),
         isCompleted: false,
     });
 
@@ -33,9 +33,10 @@ const index = () => {
         try {
             await addDoc(collection(firebaseDB, 'tasks'), {
                 ...task,
-                remainderAt: `${dayjs(dateTime.current.date).format(
-                    'DD MMMM, YYYY'
-                )} ${dayjs(dateTime.current.time).format('hh:mm A')}`,
+                remainderAt: formateDateTime(
+                    dateTime.current.date,
+                    dateTime.current.time
+                ),
             });
             navigation.goBack();
         } catch (e) {

@@ -1,14 +1,16 @@
 import AddButton from '@/components/AddButton';
 import NotesCard from '@/components/NotesCard';
 import { firebaseDB } from '@/config/firebase';
-import { TNotes } from '@/types/commonTypes';
+import { handleBiometricAuth } from '@/context/biometric';
+import { useGlobalState } from '@/hooks/useGlobalState';
+import { buttons } from '@/styles/custom-styles';
 import { router } from 'expo-router';
 import {
     collection,
     deleteDoc,
     doc,
-    getDocs,
     onSnapshot,
+    updateDoc,
 } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
 import {
@@ -20,7 +22,7 @@ import {
 } from 'react-native';
 
 const notes = () => {
-    const [notesList, setNotesList] = useState<TNotes[]>([]);
+    const { notesList, setNotesList } = useGlobalState();
     const [selected, setSelected] = useState<string[]>([]);
     console.log('selected', selected);
     useEffect(() => {
@@ -37,18 +39,27 @@ const notes = () => {
         );
         return () => unSubscribe();
     }, []);
+
+    const handleOnLongPress = (id: string) => {
+        Vibration.vibrate(50);
+        setSelected([...selected, id]);
+    };
+
+    const handleLockNotes = async () => {
+        const updateNotes = selected.map((id) =>
+            updateDoc(doc(firebaseDB, 'notes', id), { isLocked: true })
+        );
+        await Promise.all(updateNotes);
+    };
+
     const deleteMultipleNotes = async () => {
         const notesToDelete = selected.map((id) =>
             deleteDoc(doc(firebaseDB, 'notes', id))
         );
         await Promise.all(notesToDelete);
     };
-    const longPressFunction = (id: string) => {
-        Vibration.vibrate(50);
-        console.log('longpressd', id);
-        setSelected([...selected, id]);
-    };
-    const handleNotesCardPress = (id: string) => {
+
+    const handleNotesCardPress = async (id: string, isLocked: boolean) => {
         if (selected.length) {
             const isNotesSelected = selected.find((item) => item === id);
             if (isNotesSelected) {
@@ -57,9 +68,23 @@ const notes = () => {
                 setSelected([...selected, id]);
             }
         } else {
-            router.push('/notesForm');
+            if (isLocked) {
+                const isBiometricAuth = await handleBiometricAuth();
+                if (isBiometricAuth) {
+                    router.push({
+                        pathname: '/notesForm',
+                        params: { notesId: id },
+                    });
+                }
+            } else {
+                router.push({
+                    pathname: '/notesForm',
+                    params: { notesId: id },
+                });
+            }
         }
     };
+
     return (
         <View className="h-full">
             {selected.length && (
@@ -67,31 +92,25 @@ const notes = () => {
                     <View className="flex flex-row ml-auto gap-8">
                         <TouchableOpacity
                             onPress={() => setSelected([])}
-                            style={{
-                                borderWidth: 1.5,
-                                borderColor: '#244f8f',
-                                borderRadius: 8,
-                                height: 40,
-                                width: 100,
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                            }}
+                            style={buttons.clear}
                         >
                             <Text>Clear</Text>
                         </TouchableOpacity>
+                        {/* <TouchableOpacity
+                            onPress={handleLockNotes}
+                            style={buttons.lock}
+                        >
+                            <Text>Lock</Text>
+                        </TouchableOpacity> */}
                         <TouchableOpacity
                             onPress={deleteMultipleNotes}
-                            style={{
-                                borderWidth: 1.5,
-                                borderColor: '#ff0000',
-                                borderRadius: 8,
-                                height: 40,
-                                width: 100,
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                            }}
+                            style={buttons.delete}
                         >
-                            <Text>Delete All</Text>
+                            <Text>
+                                {selected.length === 1
+                                    ? 'Delete'
+                                    : 'Delete All'}
+                            </Text>
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -103,7 +122,7 @@ const notes = () => {
                             key={notes.id}
                             notes={notes}
                             onPress={handleNotesCardPress}
-                            onLongPress={longPressFunction}
+                            onLongPress={handleOnLongPress}
                             selected={selected}
                         />
                     ))}

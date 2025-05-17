@@ -58,7 +58,8 @@ export default function RootLayout() {
                 <Stack.Screen
                     name="notesForm/index"
                     options={{
-                        headerShown: false,
+                        headerTitle: 'Notes',
+                        headerTintColor: colorPalette.primary,
                     }}
                 />
             </Stack>

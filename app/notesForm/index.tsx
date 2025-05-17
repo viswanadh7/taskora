@@ -1,10 +1,12 @@
 import { firebaseDB } from '@/config/firebase';
-import { useNavigation } from 'expo-router';
-import { addDoc, collection } from 'firebase/firestore';
-import React, { useEffect, useState } from 'react';
+import { useGlobalState } from '@/hooks/useGlobalState';
+import { TNewNotesForm } from '@/types/commonTypes';
+import { getRandomHexCode } from '@/utils/random-color';
+import { useGlobalSearchParams, useNavigation } from 'expo-router';
+import { addDoc, collection, doc, updateDoc } from 'firebase/firestore';
+import React, { useState } from 'react';
 import {
     ActivityIndicator,
-    BackHandler,
     Button,
     KeyboardAvoidingView,
     ScrollView,
@@ -12,30 +14,22 @@ import {
     View,
 } from 'react-native';
 
-type TNote = {
-    title: string;
-    noteData: string;
-};
 const index = () => {
     const navigation = useNavigation();
 
-    const [note, setNote] = useState<TNote>({ title: '', noteData: '' });
+    const { notesId } = useGlobalSearchParams();
+    const { notesList } = useGlobalState();
+    const currentNotes = notesList.find((item) => item.id === notesId);
+
+    const [note, setNote] = useState<TNewNotesForm>({
+        title: currentNotes?.title ?? '',
+        noteData: currentNotes?.noteData ?? '',
+        updatedOn: new Date(),
+        colorCode: getRandomHexCode(),
+        isLocked: false,
+    });
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
-    // useEffect(() => {
-    //     const backAction = () => {
-    //         addNotes();
-    //         navigation.goBack();
-    //         return true;
-    //     };
-
-    //     const backHandler = BackHandler.addEventListener(
-    //         'hardwareBackPress',
-    //         backAction
-    //     );
-
-    //     return () => backHandler.remove();
-    // }, []);
     const addNotes = async () => {
         setIsLoading(true);
         try {
@@ -48,24 +42,44 @@ const index = () => {
             setIsLoading(false);
         }
     };
+    const updateNotes = async () => {
+        setIsLoading(true);
+        try {
+            const updatedNotes = doc(firebaseDB, 'notes', notesId as string);
+            await updateDoc(updatedNotes, note);
+            navigation.goBack();
+        } catch (error) {
+            console.log(error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handlePress = () => {
+        if (notesId) updateNotes();
+        else addNotes();
+    };
+
     if (isLoading) {
         return <ActivityIndicator size="large" />;
     }
     return (
-        <View className="h-full">
-            <View className="bg-white h-16">
+        <View className="h-full p-2">
+            <View className="h-fit">
                 <TextInput
                     style={{ fontSize: 35 }}
+                    multiline
                     placeholder="Tilte"
-                    maxLength={25}
-                    className="font-bold text-primary pl-10 w-2/3"
+                    maxLength={30}
+                    className="font-bold text-primary"
+                    value={note.title}
                     onChangeText={(e) => setNote({ ...note, title: e })}
                 />
             </View>
             <KeyboardAvoidingView>
                 <ScrollView
                     keyboardShouldPersistTaps="handled"
-                    className="p-2 h-full"
+                    className="h-full"
                 >
                     <TextInput
                         style={{
@@ -75,12 +89,13 @@ const index = () => {
                         scrollEnabled
                         className="text-xl p-2"
                         placeholder="Start writing from here..."
+                        value={note.noteData}
                         onChangeText={(e) => setNote({ ...note, noteData: e })}
                     />
                 </ScrollView>
             </KeyboardAvoidingView>
             <View className="absolute bottom-6 right-6 z-50">
-                <Button title="Save" onPress={addNotes} />
+                <Button title="Save" onPress={handlePress} />
             </View>
         </View>
     );
