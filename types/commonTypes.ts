@@ -1,3 +1,5 @@
+import { Timestamp } from "firebase/firestore";
+
 export type TNewTaskForm = {
     userId: string;
     title: string;
@@ -29,4 +31,12 @@ export type TUserDetails = {
     username?: string;
     name?: string;
     password?: string;
+};
+
+export type TFetchedMessages = {
+    id: string;
+    chatId?: string;
+    senderId?: string;
+    message?: string;
+    timestamp?: Timestamp;
 };

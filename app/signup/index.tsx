@@ -1,6 +1,8 @@
 import { firebaseDB } from '@/config/firebase';
+import expoCrypto from '@/utils/expoCrypto';
+import { isUsernameValid } from '@/utils/validate-username';
 import { router } from 'expo-router';
-import { addDoc, collection } from 'firebase/firestore';
+import { addDoc, collection, getDocs, query, where } from 'firebase/firestore';
 import React, { useState } from 'react';
 import { Text, TextInput, TouchableOpacity, View } from 'react-native';
 
@@ -10,11 +12,45 @@ const index = () => {
         name: '',
         password: '',
     });
+    const [errorMsg, setErrorMsg] = useState<string>('');
+
+    const checkUsernameTaken = async (username: string): Promise<boolean> => {
+        const userCollection = collection(firebaseDB, 'users');
+        const condition = where('username', '==', username);
+        const usernameQuery = query(userCollection, condition);
+
+        const data = await getDocs(usernameQuery);
+        if (data.docs.length) return true;
+        else return false;
+    };
 
     const handleSignUp = async () => {
+        const isUsernameTaken = await checkUsernameTaken(
+            signUpDetails.username
+        );
+        if (isUsernameValid(signUpDetails.username)) {
+            setErrorMsg(
+                'Username must start with a letter, be 3-20 characters long, and can include letters, numbers, and underscores (no trailing or double underscores).'
+            );
+            return;
+        }
+        if (isUsernameTaken) {
+            setErrorMsg(
+                'Username is already taken. Please choose a different one.'
+            );
+            return;
+        }
+        const hashedPassword = await expoCrypto.hashPassword(
+            signUpDetails.password
+        );
+        const updatedSignUpDetails = {
+            ...signUpDetails,
+            password: hashedPassword,
+        };
+
         try {
-            await addDoc(collection(firebaseDB, 'users'), signUpDetails);
-            router.push('/login');
+            await addDoc(collection(firebaseDB, 'users'), updatedSignUpDetails);
+            router.replace('/login');
         } catch (error) {
             console.log(error);
         }
@@ -32,9 +68,10 @@ const index = () => {
                 <TextInput
                     className="border border-black/30 rounded-lg py-3 pl-2 text-xl"
                     placeholder="Create an unique username"
-                    onChangeText={(e) =>
-                        setSignUpDetails({ ...signUpDetails, username: e })
-                    }
+                    onChangeText={(e) => {
+                        setErrorMsg('');
+                        setSignUpDetails({ ...signUpDetails, username: e });
+                    }}
                 />
                 <Text className="mt-4 text-xl">Name</Text>
                 <TextInput
@@ -53,6 +90,11 @@ const index = () => {
                         setSignUpDetails({ ...signUpDetails, password: e })
                     }
                 />
+                {errorMsg && (
+                    <Text className="text-red-500 text-center my-5">
+                        {errorMsg}
+                    </Text>
+                )}
                 <TouchableOpacity
                     onPress={handleSignUp}
                     className="h-10 w-28 border rounded-lg mt-5 ml-auto"

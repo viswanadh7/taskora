@@ -1,6 +1,7 @@
 import { firebaseDB } from '@/config/firebase';
 import { useGlobalState } from '@/hooks/useGlobalState';
 import { TUserDetails } from '@/types/commonTypes';
+import expoCrypto from '@/utils/expoCrypto';
 import { Link, router } from 'expo-router';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import React, { useState } from 'react';
@@ -25,10 +26,14 @@ const index = () => {
                 id: userData.docs[0].id,
                 ...userData.docs[0].data(),
             };
-            if (user.password === loginDetails.password) {
+            const isPasswordsMatched = await expoCrypto.comparePasswords(
+                loginDetails.password,
+                user.password!
+            );
+            if (isPasswordsMatched) {
                 console.log('Login successful');
                 saveUserDetails(user);
-                router.push('/(tabs)');
+                router.replace('/(tabs)');
             } else {
                 setErrorMsg('Invalid password');
             }
