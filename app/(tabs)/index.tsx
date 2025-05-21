@@ -2,7 +2,7 @@ import HomeCard from '@/components/HomeCard';
 import { useGlobalState } from '@/hooks/useGlobalState';
 import { router } from 'expo-router';
 import React from 'react';
-import { ScrollView, Text, View } from 'react-native';
+import { Button, ScrollView, Text, View } from 'react-native';
 
 const index = () => {
     const { taskList, notesList, userDetails } = useGlobalState();
@@ -21,6 +21,10 @@ const index = () => {
                     onPress={() => router.push('/(tabs)/notes')}
                 />
             </View>
+            <Button
+                title="Go to chats"
+                onPress={() => router.push('/chats')}
+            />
         </ScrollView>
     );
 };

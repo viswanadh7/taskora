@@ -7,7 +7,7 @@ import HeaderIcon from '@/components/HeaderIcon';
 
 export default function RootLayout() {
     StatusBar.setBarStyle('dark-content', true);
-    const { title } = useGlobalSearchParams();
+    const { title, chatId } = useGlobalSearchParams();
     return (
         <GlobalStateProvider>
             <Stack
@@ -61,6 +61,20 @@ export default function RootLayout() {
                     name="notesForm/index"
                     options={{
                         headerTitle: 'Notes',
+                        headerTintColor: colorPalette.primary,
+                    }}
+                />
+                <Stack.Screen
+                    name="chats/index"
+                    options={{
+                        headerTitle: 'Chats',
+                        headerTintColor: colorPalette.primary,
+                    }}
+                />
+                <Stack.Screen
+                    name="chats/[chatId]/index"
+                    options={{
+                        headerTitle: chatId as string,
                         headerTintColor: colorPalette.primary,
                     }}
                 />
