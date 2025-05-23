@@ -10,42 +10,38 @@ type TTaskCard = {
     onPress: VoidFunction;
 };
 const TaskCard = ({
-    task: { id, title, description, remainderAt, isCompleted },
+    task: { id, title, description, remainderAt, isCompleted, category },
     onDelete,
     onStatusChange,
     onPress,
 }: TTaskCard) => {
+    const categoryImages = {
+        barbell: require('../assets/categories/barbell.png'),
+        basketball: require('../assets/categories/basketball.png'),
+        book: require('../assets/categories/book.png'),
+        gmail: require('../assets/categories/gmail.png'),
+        home: require('../assets/categories/home.png'),
+        purchase: require('../assets/categories/purchase.png'),
+        work: require('../assets/categories/suitcase.png'),
+        default: require('../assets/categories/home.png'),
+    };
     return (
         <TouchableOpacity
             onPress={onPress}
-            className="p-2 border rounded-lg bg-white shadow my-2 overflow-hidden"
+            style={{ elevation: 10, backgroundColor: 'white' }}
+            className="p-2 rounded-lg my-2 overflow-hidden"
         >
-            <View className="flex flex-row items-center gap-8">
-                <TouchableOpacity
-                    onPress={() =>
-                        onStatusChange(id, {
-                            id: id,
-                            title: title,
-                            description,
-                            // remainderAt,
-                            isCompleted: !isCompleted,
-                        })
-                    }
-                >
-                    {isCompleted ? (
-                        <Feather name="check-circle" size={35} color="black" />
-                    ) : (
-                        <MaterialIcons
-                            name="check-box-outline-blank"
-                            size={35}
-                            color="black"
-                        />
-                    )}
-                </TouchableOpacity>
+            <View className="flex flex-row items-center gap-8 px-4">
+                <View>
+                    <Image
+                        style={{ height: 40, width: 40 }}
+                        source={categoryImages[category]}
+                    />
+                </View>
                 <View>
                     <Text className="text-2xl">{title}</Text>
-                    <Text className="my-2 max-w-[80%] max-h-10">
-                        {description}
+                    <Text className="my-3 max-h-10">
+                        {description?.slice(0, 30) + '...'}
                     </Text>
                     <View className="flex flex-row items-center gap-3">
                         <MaterialIcons
@@ -53,17 +49,16 @@ const TaskCard = ({
                             size={20}
                             color="black"
                         />
-                        <Text>Remainder at {remainderAt}</Text>
+                        <Text>{remainderAt}</Text>
                     </View>
                 </View>
                 <TouchableOpacity
                     onPress={() => onDelete(id)}
-                    className="absolute right-1"
+                    className="absolute right-4"
                 >
-                    <MaterialIcons
-                        name="delete-outline"
-                        size={35}
-                        color="#c70000"
+                    <Image
+                        style={{ height: 30, width: 30 }}
+                        source={require('../assets/icons/bin.png')}
                     />
                 </TouchableOpacity>
             </View>

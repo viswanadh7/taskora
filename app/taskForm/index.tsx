@@ -8,6 +8,7 @@ import { useNavigation } from 'expo-router';
 import { TNewTaskForm } from '@/types/commonTypes';
 import { formateDateTime } from '@/utils/formate-datetime';
 import { useGlobalState } from '@/hooks/useGlobalState';
+import DropDownPicker from 'react-native-dropdown-picker';
 
 const index = () => {
     const dateTime = useRef<{ date: Date; time: Date }>({
@@ -21,6 +22,9 @@ const index = () => {
     const [showDate, setShowDate] = useState(false);
     const [showTime, setShowTime] = useState(false);
 
+    const [categoryInputOpen, setCategoryInputOpen] = useState(false);
+    const [categoryValue, setCategoryValue] = useState('home');
+
     const [task, setTask] = useState<TNewTaskForm>({
         userId: userDetails?.id as string,
         title: '',
@@ -30,12 +34,22 @@ const index = () => {
             dateTime.current.time
         ),
         isCompleted: false,
+        category: '',
     });
-
+    const categories = [
+        { label: 'Workout', value: 'barbell' },
+        { label: 'Sports', value: 'basketball' },
+        { label: 'Learning', value: 'book' },
+        { label: 'Mail', value: 'gmail' },
+        { label: 'Home', value: 'home' },
+        { label: 'Shopping', value: 'purchase' },
+        { label: 'Work', value: 'suitcase' },
+    ];
     const addTask = async () => {
         try {
             await addDoc(collection(firebaseDB, 'tasks'), {
                 ...task,
+                category: categoryValue,
                 remainderAt: formateDateTime(
                     dateTime.current.date,
                     dateTime.current.time
@@ -57,14 +71,24 @@ const index = () => {
             <View className="px-4 pt-10 h-[80%] rounded-t-3xl bg-white mt-auto">
                 <Text className="mt-4 text-xl">Task title</Text>
                 <TextInput
-                    className="border border-black/30 rounded-lg py-3 pl-2 text-xl"
+                    className="border border-black rounded-lg py-3 pl-2 text-xl"
                     placeholder="Enter the task title"
                     onChangeText={(e) => setTask({ ...task, title: e })}
+                />
+                <Text className="mt-4 text-xl">Category</Text>
+                <DropDownPicker
+                    open={categoryInputOpen}
+                    value={categoryValue}
+                    items={categories}
+                    setOpen={setCategoryInputOpen}
+                    setValue={setCategoryValue}
+                    placeholder="Select the category of the task"
+                    style={{ zIndex: 1000 }}
                 />
                 <Text className="mt-4 text-xl">Description</Text>
                 <TextInput
                     multiline
-                    className="border border-black/30 rounded-lg py-3 pl-2 text-xl max-h-60"
+                    className="border border-black rounded-lg py-3 pl-2 text-xl max-h-60"
                     placeholder="Enter few words of description..."
                     onChangeText={(e) => setTask({ ...task, description: e })}
                 />

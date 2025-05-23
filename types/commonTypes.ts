@@ -1,4 +1,4 @@
-import { Timestamp } from "firebase/firestore";
+import { Timestamp } from 'firebase/firestore';
 
 export type TNewTaskForm = {
     userId: string;
@@ -6,6 +6,7 @@ export type TNewTaskForm = {
     description: string;
     remainderAt: string;
     isCompleted: boolean;
+    category: string;
 };
 
 export type TNotes = {

@@ -6,6 +6,7 @@ export type TTask = {
     description?: string;
     remainderAt?: string;
     isCompleted?: boolean;
+    category?: string;
 };
 
 export type TNotesCard = {
