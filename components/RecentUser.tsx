@@ -30,7 +30,7 @@ const RecentUser = ({ user, onPress }: TRecentUser) => {
             <View className="flex-row gap-2 items-start">
                 <Image
                     style={{ height: 60, width: 60, borderRadius: 30 }}
-                    source={require('../assets/profile/profile-sample-2.png')}
+                    source={require('../assets/profile/profile-sample.png')}
                 />
                 <View className="flex-1">
                     <View className="flex-row justify-between items-center">
