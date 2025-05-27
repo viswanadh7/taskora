@@ -2,22 +2,27 @@ import React, { useRef, useState } from 'react';
 import { Text, TextInput, TouchableOpacity, View } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import dayjs from 'dayjs';
-import { addDoc, collection } from 'firebase/firestore';
+import {
+    addDoc,
+    collection,
+} from 'firebase/firestore';
 import { firebaseDB } from '@/config/firebase';
-import { useNavigation } from 'expo-router';
+import { useGlobalSearchParams, useNavigation } from 'expo-router';
 import { TNewTaskForm } from '@/types/commonTypes';
 import { formateDateTime } from '@/utils/formate-datetime';
 import { useGlobalState } from '@/hooks/useGlobalState';
 import DropDownPicker from 'react-native-dropdown-picker';
 
 const index = () => {
+    const navigation = useNavigation();
+    const { userDetails, updateNoOfTasks } = useGlobalState();
+    const { name, projectId } = useGlobalSearchParams();
+    const isTask = name === 'tasks'; // checks weather it is redirecting from tasks page or not
+
     const dateTime = useRef<{ date: Date; time: Date }>({
         date: new Date(),
         time: new Date(),
     });
-
-    const navigation = useNavigation();
-    const { userDetails } = useGlobalState();
 
     const [showDate, setShowDate] = useState(false);
     const [showTime, setShowTime] = useState(false);
@@ -44,8 +49,10 @@ const index = () => {
         { label: 'Home', value: 'home' },
         { label: 'Shopping', value: 'purchase' },
         { label: 'Work', value: 'suitcase' },
+        { label: 'Travel', value: 'airplane' },
     ];
-    const addTask = async () => {
+
+    const handleAddTask = async () => {
         try {
             await addDoc(collection(firebaseDB, 'tasks'), {
                 ...task,
@@ -55,10 +62,40 @@ const index = () => {
                     dateTime.current.time
                 ),
             });
-            navigation.goBack();
         } catch (e) {
             console.error('Error adding task: ', e);
         }
+    };
+
+    const handleAddProjectTask = async () => {
+        const projectTaskRef = collection(
+            firebaseDB,
+            'projects',
+            projectId as string,
+            'tasks'
+        );
+        try {
+            await addDoc(projectTaskRef, {
+                ...task,
+                category: categoryValue,
+                remainderAt: formateDateTime(
+                    dateTime.current.date,
+                    dateTime.current.time
+                ),
+            });
+        } catch (e) {
+            console.error('Error adding task: ', e);
+        }
+    };
+
+    const handleSubmit = async () => {
+        if (isTask) {
+            await handleAddTask();
+        } else {
+            await handleAddProjectTask();
+            await updateNoOfTasks(projectId as string);
+        }
+        navigation.goBack();
     };
     return (
         <View className="bg-primary h-full">
@@ -75,16 +112,20 @@ const index = () => {
                     placeholder="Enter the task title"
                     onChangeText={(e) => setTask({ ...task, title: e })}
                 />
-                <Text className="mt-4 text-xl">Category</Text>
-                <DropDownPicker
-                    open={categoryInputOpen}
-                    value={categoryValue}
-                    items={categories}
-                    setOpen={setCategoryInputOpen}
-                    setValue={setCategoryValue}
-                    placeholder="Select the category of the task"
-                    style={{ zIndex: 1000 }}
-                />
+                {isTask && (
+                    <View>
+                        <Text className="mt-4 text-xl">Category</Text>
+                        <DropDownPicker
+                            open={categoryInputOpen}
+                            value={categoryValue}
+                            items={categories}
+                            setOpen={setCategoryInputOpen}
+                            setValue={setCategoryValue}
+                            placeholder="Select the category of the task"
+                            style={{ zIndex: 1000 }}
+                        />
+                    </View>
+                )}
                 <Text className="mt-4 text-xl">Description</Text>
                 <TextInput
                     multiline
@@ -136,7 +177,7 @@ const index = () => {
                     />
                 )}
                 <TouchableOpacity
-                    onPress={addTask}
+                    onPress={handleSubmit}
                     className="h-10 w-28 border rounded-lg mt-5 ml-auto"
                 >
                     <Text className="text-center my-auto text-lg">Add</Text>

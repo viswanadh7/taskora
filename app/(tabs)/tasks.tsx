@@ -130,6 +130,7 @@ const tasks = () => {
                                 task={task}
                                 onDelete={deleteTask}
                                 onStatusChange={changeTaskStatus}
+                                isEditable={false}
                                 onPress={() => {
                                     router.push({
                                         pathname: '/taskDetails/[taskId]',
@@ -148,7 +149,14 @@ const tasks = () => {
                     )}
                 </ScrollView>
             )}
-            <AddButton onPress={() => router.push('/taskForm')} />
+            <AddButton
+                onPress={() =>
+                    router.push({
+                        pathname: '/taskForm',
+                        params: { name: 'tasks' },
+                    })
+                }
+            />
         </View>
     );
 };

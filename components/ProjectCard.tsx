@@ -2,28 +2,38 @@ import React from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import ProgressBar from './ProgressBar';
 import dayjs from 'dayjs';
+import { TProjectsList } from '@/types/commonTypes';
+
+import customParseFormat from 'dayjs/plugin/customParseFormat';
+dayjs.extend(customParseFormat);
 
 type TProjectCard = {
-    projectTitle: string;
-    progress: number;
-    startDate: string;
-    endDate: string;
-    noOfTasks: number;
-    priority: string;
+    project: TProjectsList;
+    onPress: VoidFunction;
 };
 const ProjectCard = ({
-    projectTitle,
-    progress,
-    startDate,
-    endDate,
-    noOfTasks,
-    priority,
+    project: {
+        projectName,
+        priority,
+        completedPercentage,
+        startDate,
+        endDate,
+        noOfTasks,
+    },
+    onPress,
 }: TProjectCard) => {
     return (
-        <TouchableOpacity className="border border-black/20 rounded-lg p-2 bg-white shadow-2xl my-2">
+        <TouchableOpacity
+            style={{ elevation: 10 }}
+            onPress={onPress}
+            className="rounded-lg p-2 bg-white my-2"
+        >
             <View className="flex gap-4 py-4">
-                <Text className="text-2xl">{projectTitle}</Text>
-                <ProgressBar progress={progress} showProgressNumber={true} />
+                <Text className="text-2xl text-primary font-bold">{projectName}</Text>
+                <ProgressBar
+                    progress={completedPercentage!}
+                    showProgressNumber={true}
+                />
                 <View className="w-[70%]">
                     <View className="flex flex-row justify-between">
                         <Text>{startDate}</Text>
@@ -41,7 +51,7 @@ const ProjectCard = ({
                                 : 'bg-[#43a047]'
                         }`}
                     >
-                        {priority.toUpperCase()}
+                        {priority?.toUpperCase()}
                     </Text>
                 </View>
             </View>

@@ -41,3 +41,31 @@ export type TFetchedMessages = {
     message?: string;
     timestamp?: Timestamp;
 };
+
+export type TProjectsList = {
+    id: string;
+    projectName?: string;
+    description?: string;
+    priority?: string;
+    noOfTasks?: number;
+    completedPercentage?: number;
+    startDate?: string;
+    endDate?: string;
+};
+
+export type TTask = {
+    id: string;
+    title?: string;
+    description?: string;
+    remainderAt?: string;
+    isCompleted?: boolean;
+    category?: string;
+};
+
+export type TProjectTask = {
+    id: string;
+    title?: string;
+    description?: string;
+    remainderAt?: string;
+    isCompleted?: boolean;
+};
