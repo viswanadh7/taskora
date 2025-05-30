@@ -1,3 +1,4 @@
+import CustomTextInput from '@/components/CustomTextInput';
 import { firebaseDB } from '@/config/firebase';
 import { useGlobalState } from '@/hooks/useGlobalState';
 import { TUserDetails } from '@/types/commonTypes';
@@ -5,7 +6,7 @@ import expoCrypto from '@/utils/expoCrypto';
 import { Link, router } from 'expo-router';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import React, { useState } from 'react';
-import { Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Text, TouchableOpacity, View } from 'react-native';
 
 const index = () => {
     const { saveUserDetails } = useGlobalState();
@@ -51,19 +52,16 @@ const index = () => {
                 Welcome back!!!
             </Text>
             <View className="px-4 pt-10 h-[80%] rounded-t-3xl bg-white mt-auto">
-                <Text className="mt-4 text-xl">Username</Text>
-                <TextInput
-                    className="border border-black/30 rounded-lg py-3 pl-2 text-xl"
+                <CustomTextInput
+                    label="Username"
                     placeholder="Enter your unique username"
                     onChangeText={(e) => {
                         setLoginDetails({ ...loginDetails, username: e });
                         setErrorMsg(null);
                     }}
                 />
-                <Text className="mt-4 text-xl">Password</Text>
-                <TextInput
-                    secureTextEntry
-                    className="border border-black/30 rounded-lg py-3 pl-2 text-xl"
+                <CustomTextInput
+                    label="Password"
                     placeholder="Enter your password"
                     onChangeText={(e) => {
                         setLoginDetails({ ...loginDetails, password: e });

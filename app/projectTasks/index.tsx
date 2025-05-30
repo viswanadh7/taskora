@@ -49,7 +49,9 @@ const index = () => {
                     id: doc.id,
                     ...doc.data(),
                 }));
-                setProjectTasks(updatedTasks);
+                setProjectTasks({
+                    [projectId as string]: updatedTasks,
+                });
                 await updateCompletedPercentage(
                     projectId as string,
                     updatedTasks
@@ -93,25 +95,27 @@ const index = () => {
                 </View>
             ) : (
                 <ScrollView className="p-2">
-                    {projectTasks?.length ? (
-                        projectTasks?.map((task, index) => (
-                            <TaskCard
-                                key={index}
-                                task={task}
-                                onDelete={deleteTask}
-                                onStatusChange={changeTaskStatus}
-                                isEditable
-                                onPress={() => {
-                                    router.push({
-                                        pathname: '/taskDetails/[taskId]',
-                                        params: {
-                                            taskId: task.id,
-                                            title: task.title,
-                                        },
-                                    });
-                                }}
-                            />
-                        ))
+                    {projectTasks[projectId as string]?.length ? (
+                        projectTasks[projectId as string]?.map(
+                            (task, index) => (
+                                <TaskCard
+                                    key={index}
+                                    task={task}
+                                    onDelete={deleteTask}
+                                    onStatusChange={changeTaskStatus}
+                                    isEditable
+                                    onPress={() => {
+                                        router.push({
+                                            pathname: '/taskDetails/[taskId]',
+                                            params: {
+                                                taskId: task.id,
+                                                title: task.title,
+                                            },
+                                        });
+                                    }}
+                                />
+                            )
+                        )
                     ) : (
                         <View>
                             <Text>No tasks. Add to a new task</Text>

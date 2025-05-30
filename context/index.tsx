@@ -28,8 +28,10 @@ type TContext = {
     setUserDetails: Dispatch<SetStateAction<TUserDetails | undefined>>;
     projectsList: TProjectsList[];
     setProjectsList: Dispatch<SetStateAction<TProjectsList[]>>;
-    projectTasks: TProjectTask[];
-    setProjectTasks: Dispatch<SetStateAction<TProjectTask[]>>;
+    projectTasks: { [key: string]: TProjectTask[] };
+    setProjectTasks: Dispatch<
+        SetStateAction<{ [key: string]: TProjectTask[] }>
+    >;
 
     //SecureStore functions
     saveUserDetails: (userDetails: TUserDetails) => void;
@@ -50,8 +52,9 @@ export const GlobalStateProvider = ({ children }: { children: ReactNode }) => {
     const [notesList, setNotesList] = useState<TNotes[]>([]);
     const [userDetails, setUserDetails] = useState<TUserDetails>();
     const [projectsList, setProjectsList] = useState<TProjectsList[]>([]);
-    const [projectTasks, setProjectTasks] = useState<TProjectTask[]>([]);
-
+    const [projectTasks, setProjectTasks] = useState<{
+        [key: string]: TProjectTask[];
+    }>({});
     useEffect(() => {
         restoreUser();
     }, []);

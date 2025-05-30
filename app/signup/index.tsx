@@ -1,10 +1,11 @@
+import CustomTextInput from '@/components/CustomTextInput';
 import { firebaseDB } from '@/config/firebase';
 import expoCrypto from '@/utils/expoCrypto';
 import { isUsernameValid } from '@/utils/validate-username';
 import { router } from 'expo-router';
 import { addDoc, collection, getDocs, query, where } from 'firebase/firestore';
 import React, { useState } from 'react';
-import { Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Text, TouchableOpacity, View } from 'react-native';
 
 const index = () => {
     const [signUpDetails, setSignUpDetails] = useState({
@@ -64,27 +65,24 @@ const index = () => {
                 Create a new account
             </Text>
             <View className="px-4 pt-10 h-[80%] rounded-t-3xl bg-white mt-auto">
-                <Text className="mt-4 text-xl">Username</Text>
-                <TextInput
-                    className="border border-black/30 rounded-lg py-3 pl-2 text-xl"
+                <CustomTextInput
+                    label="Username"
                     placeholder="Create an unique username"
                     onChangeText={(e) => {
                         setErrorMsg('');
                         setSignUpDetails({ ...signUpDetails, username: e });
                     }}
                 />
-                <Text className="mt-4 text-xl">Name</Text>
-                <TextInput
-                    className="border border-black/30 rounded-lg py-3 pl-2 text-xl"
+                <CustomTextInput
+                    label="Name"
                     placeholder="Enter your name"
                     onChangeText={(e) =>
                         setSignUpDetails({ ...signUpDetails, name: e })
                     }
                 />
-                <Text className="mt-4 text-xl">Password</Text>
-                <TextInput
+                <CustomTextInput
                     secureTextEntry
-                    className="border border-black/30 rounded-lg py-3 pl-2 text-xl"
+                    label="Password"
                     placeholder="Create password"
                     onChangeText={(e) =>
                         setSignUpDetails({ ...signUpDetails, password: e })

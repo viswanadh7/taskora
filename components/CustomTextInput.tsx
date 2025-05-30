@@ -12,7 +12,7 @@ const CustomTextInput = ({ label, placeholder, ...rest }: TCustomTextInput) => {
             <Text className="text-xl">{label}</Text>
             <TextInput
                 multiline
-                className="border border-black rounded-lg py-3 pl-2 text-xl max-h-60"
+                className="border-b border-black py-3 pl-2 text-xl text-black max-h-60"
                 placeholder={placeholder}
                 {...rest}
             />

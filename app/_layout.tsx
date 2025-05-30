@@ -3,11 +3,12 @@ import '../global.css';
 import { StatusBar, Text, View } from 'react-native';
 import { colorPalette } from '@/styles/colors';
 import { GlobalStateProvider } from '@/context';
-import HeaderIcon from '@/components/HeaderIcon';
+import Header from '@/components/Header';
 
 export default function RootLayout() {
-    StatusBar.setBarStyle('dark-content', true);
+    StatusBar.setBackgroundColor('white');
     const { title, chatId, projectName } = useGlobalSearchParams();
+
     return (
         <GlobalStateProvider>
             <Stack
@@ -22,19 +23,21 @@ export default function RootLayout() {
                 <Stack.Screen
                     name="login/index"
                     options={{
-                        headerTitle: () => <HeaderIcon />,
+                        headerTitle: 'Taskora',
+                        headerTintColor: colorPalette.primary,
                     }}
                 />
                 <Stack.Screen
                     name="signup/index"
                     options={{
-                        headerTitle: () => <HeaderIcon />,
+                        headerTitle: 'Taskora',
+                        headerTintColor: colorPalette.primary,
                     }}
                 />
                 <Stack.Screen
                     name="(tabs)"
                     options={{
-                        headerTitle: () => <HeaderIcon />,
+                        header: () => <Header />,
                     }}
                 />
                 <Stack.Screen

@@ -83,7 +83,15 @@ const index = () => {
                     setOpen={setPriorityInputOpen}
                     setValue={setPriority}
                     placeholder="Select the category of the task"
-                    style={{ zIndex: 1000 }}
+                    style={{
+                        zIndex: 1000,
+                        borderBottomWidth: 1,
+                        borderTopWidth: 0,
+                        borderLeftWidth: 0,
+                        borderRightWidth: 0,
+                        borderRadius: 'none',
+                        backgroundColor: 'none',
+                    }}
                 />
             </View>
             <View className="flex flex-row justify-between my-5">
