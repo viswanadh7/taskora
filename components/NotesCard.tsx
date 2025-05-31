@@ -10,19 +10,18 @@ dayjs.extend(advancedFormat);
 
 const NotesCard = ({ notes, onPress, onLongPress, selected }: TNotesCard) => {
     const isSelected = selected.find((item) => item === notes.id);
-    const updatedOn = Date(notes.updatedOn);
-    console.log(updatedOn);
 
     return (
         <TouchableOpacity
             style={{
+                elevation: 10,
                 backgroundColor: notes.colorCode,
                 borderWidth: isSelected ? 2 : 0,
                 borderColor: isSelected && 'black',
             }}
             onPress={() => onPress(notes.id, notes.isLocked!)}
             onLongPress={() => onLongPress(notes.id)}
-            className="rounded-xl p-4 w-[49%] shadow-xl"
+            className="rounded-xl p-4 w-[49%]"
         >
             {isSelected && (
                 <Feather
@@ -38,10 +37,14 @@ const NotesCard = ({ notes, onPress, onLongPress, selected }: TNotesCard) => {
                 />
             )}
             <Text style={{ fontSize: 12 }} className="text-[#37474F]">
-                {dayjs(updatedOn).format('Do MMMM')}
+                {notes.updatedOn}
             </Text>
             <Text className="text-2xl mb-4">{notes.title}</Text>
-            <Text className="h-40 text-[#37474F]">{notes.noteData}</Text>
+            <Text className="h-40 text-[#37474F]">
+                {notes.noteData!.length > 130
+                    ? notes.noteData?.slice(0, 130) + '...'
+                    : notes.noteData}
+            </Text>
         </TouchableOpacity>
     );
 };

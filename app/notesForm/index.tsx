@@ -2,15 +2,17 @@ import { firebaseDB } from '@/config/firebase';
 import { useGlobalState } from '@/hooks/useGlobalState';
 import { TNewNotesForm } from '@/types/commonTypes';
 import { getRandomHexCode } from '@/utils/random-color';
+import dayjs from 'dayjs';
 import { useGlobalSearchParams, useNavigation } from 'expo-router';
 import { addDoc, collection, doc, updateDoc } from 'firebase/firestore';
 import React, { useState } from 'react';
 import {
     ActivityIndicator,
-    Button,
     KeyboardAvoidingView,
     ScrollView,
+    Text,
     TextInput,
+    TouchableOpacity,
     View,
 } from 'react-native';
 
@@ -25,7 +27,7 @@ const index = () => {
         userId: userDetails?.id as string,
         title: currentNotes?.title ?? '',
         noteData: currentNotes?.noteData ?? '',
-        updatedOn: new Date(),
+        updatedOn: dayjs(new Date()).format('Do MMMM'),
         colorCode: getRandomHexCode(),
         isLocked: false,
     });
@@ -95,8 +97,13 @@ const index = () => {
                     />
                 </ScrollView>
             </KeyboardAvoidingView>
-            <View className="absolute bottom-6 right-6 z-50">
-                <Button title="Save" onPress={handlePress} />
+            <View className="absolute bottom-10 right-6 z-50">
+                <TouchableOpacity
+                    onPress={handlePress}
+                    className="h-10 w-28 border rounded-lg mt-5 ml-auto"
+                >
+                    <Text className="text-center my-auto text-lg">Save</Text>
+                </TouchableOpacity>
             </View>
         </View>
     );

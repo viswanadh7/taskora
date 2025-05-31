@@ -13,7 +13,7 @@ export type TNotes = {
     id: string;
     title?: string;
     noteData?: string;
-    updatedOn?: Date;
+    updatedOn?: string;
     colorCode?: string;
     isLocked?: boolean;
 };
@@ -22,7 +22,7 @@ export type TNewNotesForm = {
     userId: string;
     title: string;
     noteData: string;
-    updatedOn: Date;
+    updatedOn: Date | string;
     colorCode: string;
     isLocked: boolean;
 };

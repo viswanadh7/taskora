@@ -1,5 +1,6 @@
 import AddButton from '@/components/AddButton';
 import NotesCard from '@/components/NotesCard';
+import NotesLoading from '@/components/NotesLoading';
 import { firebaseDB } from '@/config/firebase';
 import { handleBiometricAuth } from '@/context/biometric';
 import { useGlobalState } from '@/hooks/useGlobalState';
@@ -16,7 +17,6 @@ import {
 } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
 import {
-    ActivityIndicator,
     ScrollView,
     Text,
     TouchableOpacity,
@@ -92,7 +92,7 @@ const notes = () => {
         }
     };
     if (isLoading) {
-        return <ActivityIndicator size="large" />;
+        return <NotesLoading />;
     }
 
     return (

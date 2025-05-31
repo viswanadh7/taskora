@@ -7,13 +7,13 @@ import {
     doc,
     onSnapshot,
     query,
-    updateDoc,
+    // updateDoc,
     where,
 } from 'firebase/firestore';
 import { firebaseDB } from '@/config/firebase';
 import { schedulePushNotification } from '@/components/Notify';
 import dayjs from 'dayjs';
-import { TTask } from '@/types/componentTypes';
+// import { TTask } from '@/types/componentTypes';
 import { useGlobalState } from '@/hooks/useGlobalState';
 import TaskLoading from '@/components/TaskLoading';
 import AddButton from '@/components/AddButton';
@@ -49,36 +49,10 @@ const tasks = () => {
         // Cleanup listener on unmount
         return () => unsubscribe();
     }, []);
-    // const getTasks = async () => {
-    //     setIsLoading(true);
-    //     try {
-    //         const querySnapshot = await getDocs(
-    //             collection(firebaseDB, 'tasks')
-    //         );
-    //         const tasks = querySnapshot.docs.map((doc) => ({
-    //             id: doc.id,
-    //             ...doc.data(),
-    //         }));
-    //         console.log('tasks from db', tasks);
-    //         setTaskList(tasks);
-    //     } catch (e) {
-    //         console.error('Error fetching tasks: ', e);
-    //     } finally {
-    //         setIsLoading(false);
-    //     }
-    // };
-    const changeTaskStatus = async (id: string, updatedTask: TTask) => {
-        const task = doc(firebaseDB, 'tasks', id);
-        await updateDoc(task, updatedTask);
-        // getTasks();
-    };
+
     const deleteTask = async (id: string) => {
         await deleteDoc(doc(firebaseDB, 'tasks', id));
-        // getTasks();
     };
-    // useEffect(() => {
-    //     getTasks();
-    // }, []);
 
     useEffect(() => {
         taskList?.forEach(async (task) => {
@@ -116,11 +90,7 @@ const tasks = () => {
                 </TouchableOpacity>
             </View> */}
             {isLoading ? (
-                <View className="p-2">
-                    <TaskLoading />
-                    <TaskLoading />
-                    <TaskLoading />
-                </View>
+                <TaskLoading />
             ) : (
                 <ScrollView className="p-2">
                     {taskList?.length ? (
@@ -129,7 +99,6 @@ const tasks = () => {
                                 key={index}
                                 task={task}
                                 onDelete={deleteTask}
-                                onStatusChange={changeTaskStatus}
                                 isEditable={false}
                                 onPress={() => {
                                     router.push({

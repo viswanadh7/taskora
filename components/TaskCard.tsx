@@ -12,7 +12,7 @@ import { TTask } from '@/types/componentTypes';
 type TTaskCard = {
     task: TTask;
     onDelete: (id: string) => void;
-    onStatusChange: (id: string, isCompleted: boolean) => void;
+    onStatusChange?: (id: string, isCompleted: boolean) => void;
     onPress: VoidFunction;
     isEditable: boolean;
 };
@@ -45,7 +45,7 @@ const TaskCard = ({
             <View className="flex flex-row items-center gap-8 px-4">
                 {isEditable ? (
                     <TouchableOpacity
-                        onPress={() => onStatusChange(id, isCompleted!)}
+                        onPress={() => onStatusChange?.(id, isCompleted!)}
                     >
                         {isCompleted ? (
                             <Image
