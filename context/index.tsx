@@ -90,7 +90,9 @@ export const GlobalStateProvider = ({ children }: { children: ReactNode }) => {
     ) => {
         const completedTasks = tasks.filter((task) => task.isCompleted);
         const totalTasks = tasks.length;
-        const percent = Math.floor((completedTasks.length / totalTasks) * 100);
+        const percent = totalTasks
+            ? Math.floor((completedTasks.length / totalTasks) * 100)
+            : 0;
 
         try {
             await updateDoc(doc(firebaseDB, 'projects', projectId), {

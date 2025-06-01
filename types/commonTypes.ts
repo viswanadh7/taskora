@@ -32,6 +32,7 @@ export type TUserDetails = {
     username?: string;
     name?: string;
     password?: string;
+    profilePhoto?: string;
 };
 
 export type TFetchedMessages = {

@@ -100,7 +100,7 @@ const index = () => {
             <View className="absolute bottom-10 right-6 z-50">
                 <TouchableOpacity
                     onPress={handlePress}
-                    className="h-10 w-28 border rounded-lg mt-5 ml-auto"
+                    className="h-10 w-28 bg-white shadow-xl border rounded-lg mt-5 ml-auto"
                 >
                     <Text className="text-center my-auto text-lg">Save</Text>
                 </TouchableOpacity>

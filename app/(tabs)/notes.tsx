@@ -17,6 +17,7 @@ import {
 } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
 import {
+    Image,
     ScrollView,
     Text,
     TouchableOpacity,
@@ -125,18 +126,35 @@ const notes = () => {
                     </View>
                 </View>
             )}
-            <ScrollView>
-                <View className="flex flex-row flex-wrap justify-between gap-2 p-2">
-                    {notesList.map((notes) => (
-                        <NotesCard
-                            key={notes.id}
-                            notes={notes}
-                            onPress={handleNotesCardPress}
-                            onLongPress={handleOnLongPress}
-                            selected={selected}
-                        />
-                    ))}
-                </View>
+            <ScrollView
+                contentContainerStyle={{
+                    flexGrow: 1,
+                    justifyContent: notesList?.length ? 'flex-start' : 'center',
+                }}
+            >
+                {notesList.length ? (
+                    <View className="flex flex-row flex-wrap justify-between gap-2 p-2">
+                        {notesList.map((notes) => (
+                            <NotesCard
+                                key={notes.id}
+                                notes={notes}
+                                onPress={handleNotesCardPress}
+                                onLongPress={handleOnLongPress}
+                                selected={selected}
+                            />
+                        ))}
+                    </View>
+                ) : (
+                    <View className="flex-1 flex-row justify-center items-center">
+                        <View>
+                            <Image
+                                style={{ height: 150, width: 150 }}
+                                source={require('../../assets/icons/stacked-paper.png')}
+                            />
+                            <Text className="text-center">No notes</Text>
+                        </View>
+                    </View>
+                )}
             </ScrollView>
             {!selected.length && (
                 <AddButton onPress={() => router.push('/notesForm')} />

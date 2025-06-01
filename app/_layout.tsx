@@ -6,7 +6,8 @@ import { GlobalStateProvider } from '@/context';
 import Header from '@/components/Header';
 
 export default function RootLayout() {
-    StatusBar.setBackgroundColor('white');
+    StatusBar.setBackgroundColor(colorPalette.primary);
+    StatusBar.setBarStyle('light-content');
     const { title, chatId, projectName } = useGlobalSearchParams();
 
     return (
@@ -24,14 +25,22 @@ export default function RootLayout() {
                     name="login/index"
                     options={{
                         headerTitle: 'Taskora',
-                        headerTintColor: colorPalette.primary,
+                        headerTintColor: 'white',
+                        headerStyle: {
+                            backgroundColor: colorPalette.primary,
+                        },
+                        headerShadowVisible: false,
                     }}
                 />
                 <Stack.Screen
                     name="signup/index"
                     options={{
                         headerTitle: 'Taskora',
-                        headerTintColor: colorPalette.primary,
+                        headerTintColor: 'white',
+                        headerStyle: {
+                            backgroundColor: colorPalette.primary,
+                        },
+                        headerShadowVisible: false,
                     }}
                 />
                 <Stack.Screen

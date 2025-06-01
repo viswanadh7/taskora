@@ -1,6 +1,7 @@
 import CustomTextInput from '@/components/CustomTextInput';
 import { firebaseDB } from '@/config/firebase';
 import expoCrypto from '@/utils/expoCrypto';
+import { getRandomProfilePhoto } from '@/utils/profile-photo';
 import { isUsernameValid } from '@/utils/validate-username';
 import { router } from 'expo-router';
 import { addDoc, collection, getDocs, query, where } from 'firebase/firestore';
@@ -12,6 +13,7 @@ const index = () => {
         username: '',
         name: '',
         password: '',
+        profilePhoto: getRandomProfilePhoto(),
     });
     const [errorMsg, setErrorMsg] = useState<string>('');
 

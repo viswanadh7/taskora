@@ -1,6 +1,6 @@
 import ProjectCard from '@/components/ProjectCard';
 import React, { useEffect } from 'react';
-import { ScrollView, View } from 'react-native';
+import { Image, ScrollView, Text, View } from 'react-native';
 import AddButton from '@/components/AddButton';
 import { router } from 'expo-router';
 import { collection, onSnapshot, query, where } from 'firebase/firestore';
@@ -26,22 +26,42 @@ const projects = () => {
     }, []);
     return (
         <View className="h-full">
-            <ScrollView className="p-2">
-                {projectsList.map((project, index) => (
-                    <ProjectCard
-                        key={index}
-                        project={project}
-                        onPress={() =>
-                            router.push({
-                                pathname: '/projectTasks',
-                                params: {
-                                    projectId: project.id,
-                                    projectName: project.projectName,
-                                },
-                            })
-                        }
-                    />
-                ))}
+            <ScrollView
+                className="p-2"
+                contentContainerStyle={{
+                    flexGrow: 1,
+                    justifyContent: projectsList?.length
+                        ? 'flex-start'
+                        : 'center',
+                }}
+            >
+                {projectsList.length ? (
+                    projectsList.map((project, index) => (
+                        <ProjectCard
+                            key={index}
+                            project={project}
+                            onPress={() =>
+                                router.push({
+                                    pathname: '/projectTasks',
+                                    params: {
+                                        projectId: project.id,
+                                        projectName: project.projectName,
+                                    },
+                                })
+                            }
+                        />
+                    ))
+                ) : (
+                    <View className="flex-1 flex-row justify-center items-center">
+                        <View>
+                            <Image
+                                style={{ height: 150, width: 150 }}
+                                source={require('../../assets/icons/book.png')}
+                            />
+                            <Text className="text-center">No projects</Text>
+                        </View>
+                    </View>
+                )}
             </ScrollView>
             <AddButton onPress={() => router.push('/projectForm')} />
         </View>

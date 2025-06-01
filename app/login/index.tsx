@@ -63,6 +63,7 @@ const index = () => {
                 <CustomTextInput
                     label="Password"
                     placeholder="Enter your password"
+                    secureTextEntry
                     onChangeText={(e) => {
                         setLoginDetails({ ...loginDetails, password: e });
                         setErrorMsg(null);

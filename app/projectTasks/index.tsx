@@ -1,6 +1,6 @@
 import TaskCard from '@/components/TaskCard';
 import React, { useEffect, useState } from 'react';
-import { ScrollView, Text, View } from 'react-native';
+import { Image, ScrollView, Text, Vibration, View } from 'react-native';
 import {
     collection,
     deleteDoc,
@@ -65,6 +65,8 @@ const index = () => {
     }, []);
 
     const changeTaskStatus = async (id: string, isCompleted: boolean) => {
+        Vibration.vibrate(50);
+
         const task = doc(
             firebaseDB,
             'projects',
@@ -88,13 +90,18 @@ const index = () => {
     return (
         <View className="h-full">
             {isLoading ? (
-                <View className="p-2">
-                    <TaskLoading />
-                    <TaskLoading />
-                    <TaskLoading />
-                </View>
+                <TaskLoading />
             ) : (
-                <ScrollView className="p-2">
+                <ScrollView
+                    className="p-2"
+                    contentContainerStyle={{
+                        flexGrow: 1,
+                        justifyContent: projectTasks[projectId as string]
+                            ?.length
+                            ? 'flex-start'
+                            : 'center',
+                    }}
+                >
                     {projectTasks[projectId as string]?.length ? (
                         projectTasks[projectId as string]?.map(
                             (task, index) => (
@@ -117,8 +124,14 @@ const index = () => {
                             )
                         )
                     ) : (
-                        <View>
-                            <Text>No tasks. Add to a new task</Text>
+                        <View className="flex-1 flex-row justify-center items-center">
+                            <View>
+                                <Image
+                                    style={{ height: 100, width: 100 }}
+                                    source={require('../../assets/icons/checklist.png')}
+                                />
+                                <Text className="text-center">No tasks</Text>
+                            </View>
                         </View>
                     )}
                 </ScrollView>

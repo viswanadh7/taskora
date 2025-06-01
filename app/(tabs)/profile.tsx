@@ -1,5 +1,6 @@
 import ProfileText from '@/components/ProfileText';
 import { useGlobalState } from '@/hooks/useGlobalState';
+import { getProfilePhoto } from '@/utils/profile-photo';
 import React from 'react';
 import { Image, Text, TouchableOpacity, View } from 'react-native';
 
@@ -10,7 +11,10 @@ const profile = () => {
             <View className="py-4">
                 <View className="flex flex-row justify-center">
                     <Image
-                        source={require('../../assets/profile/profile-sample.png')}
+                        style={{ height: 150, width: 150 }}
+                        source={getProfilePhoto(
+                            userDetails?.profilePhoto as string
+                        )}
                     />
                 </View>
                 <Text className="text-2xl text-center">

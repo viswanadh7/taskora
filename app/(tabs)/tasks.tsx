@@ -1,6 +1,6 @@
 import TaskCard from '@/components/TaskCard';
 import React, { useEffect, useState } from 'react';
-import { ScrollView, Text, View } from 'react-native';
+import { Image, ScrollView, Text, Vibration, View } from 'react-native';
 import {
     collection,
     deleteDoc,
@@ -51,6 +51,7 @@ const tasks = () => {
     }, []);
 
     const deleteTask = async (id: string) => {
+        Vibration.vibrate(50);
         await deleteDoc(doc(firebaseDB, 'tasks', id));
     };
 
@@ -92,7 +93,15 @@ const tasks = () => {
             {isLoading ? (
                 <TaskLoading />
             ) : (
-                <ScrollView className="p-2">
+                <ScrollView
+                    className="p-2"
+                    contentContainerStyle={{
+                        flexGrow: 1,
+                        justifyContent: taskList?.length
+                            ? 'flex-start'
+                            : 'center',
+                    }}
+                >
                     {taskList?.length ? (
                         taskList?.map((task, index) => (
                             <TaskCard
@@ -112,8 +121,14 @@ const tasks = () => {
                             />
                         ))
                     ) : (
-                        <View>
-                            <Text>No tasks. Add to a new task</Text>
+                        <View className="flex-1 flex-row justify-center items-center">
+                            <View>
+                                <Image
+                                    style={{ height: 100    , width: 100     }}
+                                    source={require('../../assets/icons/checklist.png')}
+                                />
+                                <Text className="text-center">No tasks</Text>
+                            </View>
                         </View>
                     )}
                 </ScrollView>

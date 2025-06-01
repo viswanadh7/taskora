@@ -8,7 +8,7 @@ const index = () => {
     const { taskList, notesList, projectsList, userDetails } = useGlobalState();
     return (
         <ScrollView className="p-2">
-            <Text className="text-2xl">Hi {userDetails?.name}!</Text>
+            <Text className="text-2xl my-5">Hi {userDetails?.name}! 👋</Text>
             <View className="flex flex-row flex-wrap justify-between gap-2">
                 <HomeCard
                     title="No.of tasks"
@@ -27,7 +27,7 @@ const index = () => {
                 />
                 <HomeCard
                     title="Go to chats"
-                    data={projectsList.length}
+                    data={0}
                     onPress={() => router.push('/chats')}
                 />
             </View>
