@@ -1,21 +1,23 @@
 import CustomTextInput from '@/components/CustomTextInput';
 import { firebaseDB } from '@/config/firebase';
+import { TSignUpUser } from '@/types/commonTypes';
 import expoCrypto from '@/utils/expoCrypto';
 import { getRandomProfilePhoto } from '@/utils/profile-photo';
-import { isUsernameValid } from '@/utils/validate-username';
+import { signUpSchema } from '@/validations/schema';
+import { yupResolver } from '@hookform/resolvers/yup';
 import { router } from 'expo-router';
 import { addDoc, collection, getDocs, query, where } from 'firebase/firestore';
-import React, { useState } from 'react';
+import React from 'react';
+import { Controller, useForm } from 'react-hook-form';
 import { Text, TouchableOpacity, View } from 'react-native';
 
 const index = () => {
-    const [signUpDetails, setSignUpDetails] = useState({
-        username: '',
-        name: '',
-        password: '',
-        profilePhoto: getRandomProfilePhoto(),
-    });
-    const [errorMsg, setErrorMsg] = useState<string>('');
+    const {
+        control,
+        handleSubmit,
+        setError,
+        formState: { errors },
+    } = useForm({ resolver: yupResolver(signUpSchema) });
 
     const checkUsernameTaken = async (username: string): Promise<boolean> => {
         const userCollection = collection(firebaseDB, 'users');
@@ -27,29 +29,27 @@ const index = () => {
         else return false;
     };
 
-    const handleSignUp = async () => {
+    const handleSignUp = async (signUpDetails: TSignUpUser) => {
         const isUsernameTaken = await checkUsernameTaken(
             signUpDetails.username
         );
-        if (isUsernameValid(signUpDetails.username)) {
-            setErrorMsg(
-                'Username must start with a letter, be 3-20 characters long, and can include letters, numbers, and underscores (no trailing or double underscores).'
-            );
-            return;
-        }
         if (isUsernameTaken) {
-            setErrorMsg(
-                'Username is already taken. Please choose a different one.'
-            );
+            setError('username', {
+                message:
+                    'Username is already taken. Please choose a different one.',
+            });
             return;
         }
         const hashedPassword = await expoCrypto.hashPassword(
             signUpDetails.password
         );
         const updatedSignUpDetails = {
-            ...signUpDetails,
+            name: signUpDetails.name,
+            username: signUpDetails.username,
             password: hashedPassword,
+            profilePhoto: getRandomProfilePhoto(),
         };
+        console.log('updatedSignUpDetails', updatedSignUpDetails);
 
         try {
             await addDoc(collection(firebaseDB, 'users'), updatedSignUpDetails);
@@ -67,36 +67,62 @@ const index = () => {
                 Create a new account
             </Text>
             <View className="px-4 pt-10 h-[80%] rounded-t-3xl bg-white mt-auto">
-                <CustomTextInput
-                    label="Username"
-                    placeholder="Create an unique username"
-                    onChangeText={(e) => {
-                        setErrorMsg('');
-                        setSignUpDetails({ ...signUpDetails, username: e });
-                    }}
+                <Controller
+                    name="username"
+                    control={control}
+                    render={({ field: { value, onChange } }) => (
+                        <CustomTextInput
+                            label="Username"
+                            placeholder="Create an unique username"
+                            value={value}
+                            onChangeText={onChange}
+                            errorMessage={errors.username?.message}
+                        />
+                    )}
                 />
-                <CustomTextInput
-                    label="Name"
-                    placeholder="Enter your name"
-                    onChangeText={(e) =>
-                        setSignUpDetails({ ...signUpDetails, name: e })
-                    }
+                <Controller
+                    name="name"
+                    control={control}
+                    render={({ field: { value, onChange } }) => (
+                        <CustomTextInput
+                            label="Name"
+                            placeholder="Enter your name"
+                            value={value}
+                            onChangeText={onChange}
+                            errorMessage={errors.name?.message}
+                        />
+                    )}
                 />
-                <CustomTextInput
-                    secureTextEntry
-                    label="Password"
-                    placeholder="Create password"
-                    onChangeText={(e) =>
-                        setSignUpDetails({ ...signUpDetails, password: e })
-                    }
+                <Controller
+                    name="password"
+                    control={control}
+                    render={({ field: { value, onChange } }) => (
+                        <CustomTextInput
+                            secureTextEntry
+                            label="Password"
+                            placeholder="Create password"
+                            value={value}
+                            onChangeText={onChange}
+                            errorMessage={errors.password?.message}
+                        />
+                    )}
                 />
-                {errorMsg && (
-                    <Text className="text-red-500 text-center my-5">
-                        {errorMsg}
-                    </Text>
-                )}
+                <Controller
+                    name="confirmPassword"
+                    control={control}
+                    render={({ field: { value, onChange } }) => (
+                        <CustomTextInput
+                            label="Confirm Password"
+                            placeholder="Please confirm your password"
+                            secureTextEntry
+                            value={value}
+                            onChangeText={onChange}
+                            errorMessage={errors.confirmPassword?.message}
+                        />
+                    )}
+                />
                 <TouchableOpacity
-                    onPress={handleSignUp}
+                    onPress={handleSubmit(handleSignUp)}
                     className="h-10 w-28 border rounded-lg mt-5 ml-auto"
                 >
                     <Text className="text-center my-auto text-lg">Signup</Text>

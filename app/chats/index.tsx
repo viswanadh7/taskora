@@ -13,7 +13,7 @@ import {
     getDoc,
     getDocs,
     onSnapshot,
-    orderBy,
+    // orderBy,
     query,
     Timestamp,
     where,
@@ -136,7 +136,7 @@ const index = () => {
                     onPress={() =>
                         router.push({
                             pathname: '/chats/[chatId]',
-                            params: { chatId: recentUser.id },
+                            params: { chatId: recentUser.id as string },
                         })
                     }
                 />

@@ -47,17 +47,14 @@ const TaskCard = ({
                     <TouchableOpacity
                         onPress={() => onStatusChange?.(id, isCompleted!)}
                     >
-                        {isCompleted ? (
-                            <Image
-                                style={{ height: 40, width: 40 }}
-                                source={require('../assets/icons/check.png')}
-                            />
-                        ) : (
-                            <Image
-                                style={{ height: 40, width: 40 }}
-                                source={require('../assets/icons/oval.png')}
-                            />
-                        )}
+                        <Image
+                            style={{ height: 40, width: 40 }}
+                            source={
+                                isCompleted
+                                    ? require('../assets/icons/check.png')
+                                    : require('../assets/icons/oval.png')
+                            }
+                        />
                     </TouchableOpacity>
                 ) : (
                     <View>
@@ -68,10 +65,18 @@ const TaskCard = ({
                     </View>
                 )}
                 <View>
-                    <Text className="text-2xl">{title}</Text>
-                    <Text className="my-3 max-h-10">
-                        {description?.slice(0, 30) + '...'}
+                    <Text
+                        className={`text-2xl ${description ? '' : 'mt-3 mb-5'}`}
+                    >
+                        {title}
                     </Text>
+                    {description && (
+                        <Text className="my-3 max-h-10">
+                            {description!.length > 30
+                                ? description?.slice(0, 30) + '...'
+                                : description}
+                        </Text>
+                    )}
                     <View className="flex flex-row items-center gap-3">
                         <MaterialIcons
                             name="access-alarm"
@@ -91,14 +96,6 @@ const TaskCard = ({
                     />
                 </TouchableOpacity>
             </View>
-            {/* {isCompleted && (
-                <View
-                    className="absolute min-h-full min-w-full opacity-50"
-                    pointerEvents="none"
-                >
-                    <Image source={require('../assets/images/strikes2.jpg')} />
-                </View>
-            )} */}
         </TouchableOpacity>
     );
 };

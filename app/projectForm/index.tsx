@@ -9,6 +9,9 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { useGlobalState } from '@/hooks/useGlobalState';
 import { formateProjectDate } from '@/utils/formate-projectdate';
 import { useNavigation } from 'expo-router';
+import { Controller, useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { projectSchema } from '@/validations/schema';
 
 const index = () => {
     const priorityList = [
@@ -27,19 +30,14 @@ const index = () => {
     ];
     const { userDetails } = useGlobalState();
     const navigation = useNavigation();
+    const {
+        control,
+        handleSubmit,
+        formState: { errors },
+    } = useForm({ resolver: yupResolver(projectSchema) });
 
     const [priorityInputOpen, setPriorityInputOpen] = useState(false); // State to open and close the priority dropdown
     const [priority, setPriority] = useState('high'); // State to maintain priority. Default value for priority dropdown will be high
-    const [project, setProject] = useState({
-        userId: userDetails?.id,
-        projectName: '',
-        description: '',
-        priority: priority,
-        startDate: '',
-        endDate: '',
-        noOfTasks: 0,
-        completedPercentage: 0,
-    });
     const [showStartDate, setShowStartDate] = useState(false);
     const [showEndDate, setShowEndDate] = useState(false);
 
@@ -48,15 +46,22 @@ const index = () => {
         endDate: new Date(),
     });
 
-    const handleSubmit = async () => {
+    const handleCreateProject = async (project: {
+        title: string;
+        description: string;
+    }) => {
         const dateRef = startAndEndDate.current;
+        const newProject = {
+            ...project,
+            userId: userDetails?.id,
+            priority: priority,
+            startDate: formateProjectDate(dateRef.startDate),
+            endDate: formateProjectDate(dateRef.endDate),
+            noOfTasks: 0,
+            completedPercentage: 0,
+        };
         try {
-            await addDoc(collection(firebaseDB, 'projects'), {
-                ...project,
-                priority: priority,
-                startDate: formateProjectDate(dateRef.startDate),
-                endDate: formateProjectDate(dateRef.endDate),
-            });
+            await addDoc(collection(firebaseDB, 'projects'), newProject);
             navigation.goBack();
         } catch (error) {
             console.log(error);
@@ -64,15 +69,31 @@ const index = () => {
     };
     return (
         <View className="p-2">
-            <CustomTextInput
-                label="Project name"
-                placeholder="Enter your project name"
-                onChangeText={(e) => setProject({ ...project, projectName: e })}
+            <Controller
+                name="title"
+                control={control}
+                render={({ field: { value, onChange } }) => (
+                    <CustomTextInput
+                        label="Project name"
+                        placeholder="Enter your project name"
+                        value={value}
+                        onChangeText={onChange}
+                        errorMessage={errors.title?.message}
+                    />
+                )}
             />
-            <CustomTextInput
-                label="Description"
-                placeholder="Give a brief about your project"
-                onChangeText={(e) => setProject({ ...project, description: e })}
+            <Controller
+                name="description"
+                control={control}
+                render={({ field: { value, onChange } }) => (
+                    <CustomTextInput
+                        label="Description"
+                        placeholder="Give a brief about your project"
+                        value={value}
+                        onChangeText={onChange}
+                        errorMessage={errors.description?.message}
+                    />
+                )}
             />
             <View className="my-4">
                 <Text className="text-xl">Priority</Text>
@@ -139,7 +160,7 @@ const index = () => {
                 />
             )}
             <TouchableOpacity
-                onPress={handleSubmit}
+                onPress={handleSubmit(handleCreateProject)}
                 className="border rounded p-3 w-40 ml-auto"
             >
                 <Text className="text-center">Create project</Text>

@@ -3,7 +3,7 @@ import { Timestamp } from 'firebase/firestore';
 export type TNewTaskForm = {
     userId: string;
     title: string;
-    description: string;
+    description?: string;
     remainderAt: string;
     isCompleted: boolean;
     category: string;
@@ -45,7 +45,7 @@ export type TFetchedMessages = {
 
 export type TProjectsList = {
     id: string;
-    projectName?: string;
+    title?: string;
     description?: string;
     priority?: string;
     noOfTasks?: number;
@@ -69,4 +69,10 @@ export type TProjectTask = {
     description?: string;
     remainderAt?: string;
     isCompleted?: boolean;
+};
+
+export type TSignUpUser = {
+    username: string;
+    name: string;
+    password: string;
 };

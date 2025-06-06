@@ -13,7 +13,8 @@ type TProjectCard = {
 };
 const ProjectCard = ({
     project: {
-        projectName,
+        title,
+        description,
         priority,
         completedPercentage,
         startDate,
@@ -29,7 +30,12 @@ const ProjectCard = ({
             className="rounded-lg p-2 bg-white my-2"
         >
             <View className="flex gap-4 py-4">
-                <Text className="text-2xl text-primary font-bold">{projectName}</Text>
+                <Text className="text-2xl text-primary font-bold">{title}</Text>
+                <Text>
+                    {description!.length > 100
+                        ? description?.slice(0, 100) + '...'
+                        : description}
+                </Text>
                 <ProgressBar
                     progress={completedPercentage!}
                     showProgressNumber={true}

@@ -5,18 +5,27 @@ import { TUserDetails } from '@/types/commonTypes';
 import expoCrypto from '@/utils/expoCrypto';
 import { Link, router } from 'expo-router';
 import { collection, getDocs, query, where } from 'firebase/firestore';
-import React, { useState } from 'react';
+import React from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
+import { useForm, Controller } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { loginSchema } from '@/validations/schema';
 
 const index = () => {
     const { saveUserDetails } = useGlobalState();
-    const [loginDetails, setLoginDetails] = useState({
-        username: '',
-        password: '',
+    const {
+        control,
+        handleSubmit,
+        setError,
+        formState: { errors },
+    } = useForm({
+        resolver: yupResolver(loginSchema),
     });
-    const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-    const handleLogin = async () => {
+    const handleLogin = async (loginDetails: {
+        username: string;
+        password: string;
+    }) => {
         const loginQuery = query(
             collection(firebaseDB, 'users'),
             where('username', '==', loginDetails.username)
@@ -36,10 +45,12 @@ const index = () => {
                 saveUserDetails(user);
                 router.replace('/(tabs)');
             } else {
-                setErrorMsg('Invalid password');
+                setError('password', { message: 'Incorrect password' });
             }
         } catch (error) {
-            setErrorMsg('User not found');
+            setError('username', {
+                message: 'User not found. Please signup to create an account.',
+            });
             console.log('error', error);
         }
     };
@@ -52,31 +63,35 @@ const index = () => {
                 Welcome back!!!
             </Text>
             <View className="px-4 pt-10 h-[80%] rounded-t-3xl bg-white mt-auto">
-                <CustomTextInput
-                    label="Username"
-                    placeholder="Enter your unique username"
-                    onChangeText={(e) => {
-                        setLoginDetails({ ...loginDetails, username: e });
-                        setErrorMsg(null);
-                    }}
+                <Controller
+                    name="username"
+                    control={control}
+                    render={({ field: { value, onChange } }) => (
+                        <CustomTextInput
+                            label="Username"
+                            placeholder="Enter your unique username"
+                            value={value}
+                            onChangeText={onChange}
+                            errorMessage={errors.username?.message}
+                        />
+                    )}
                 />
-                <CustomTextInput
-                    label="Password"
-                    placeholder="Enter your password"
-                    secureTextEntry
-                    onChangeText={(e) => {
-                        setLoginDetails({ ...loginDetails, password: e });
-                        setErrorMsg(null);
-                    }}
+                <Controller
+                    name="password"
+                    control={control}
+                    render={({ field: { value, onChange } }) => (
+                        <CustomTextInput
+                            label="Password"
+                            placeholder="Enter your password"
+                            secureTextEntry
+                            value={value}
+                            onChangeText={onChange}
+                            errorMessage={errors.password?.message}
+                        />
+                    )}
                 />
-                {errorMsg && (
-                    <Text className="text-red-500 text-center my-5">
-                        {errorMsg}
-                    </Text>
-                )}
-
                 <TouchableOpacity
-                    onPress={handleLogin}
+                    onPress={handleSubmit(handleLogin)}
                     className="h-10 w-28 border rounded-lg mt-5 ml-auto"
                 >
                     <Text className="text-center my-auto text-lg">Login</Text>

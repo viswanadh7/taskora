@@ -10,12 +10,21 @@ import { formateDateTime } from '@/utils/formate-datetime';
 import { useGlobalState } from '@/hooks/useGlobalState';
 import DropDownPicker from 'react-native-dropdown-picker';
 import CustomTextInput from '@/components/CustomTextInput';
+import { Controller, useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { taskSchema } from '@/validations/schema';
 
 const index = () => {
     const navigation = useNavigation();
     const { userDetails, updateNoOfTasks } = useGlobalState();
     const { name, projectId } = useGlobalSearchParams();
     const isTask = name === 'tasks'; // checks weather it is redirecting from tasks page or not
+
+    const {
+        control,
+        handleSubmit,
+        formState: { errors },
+    } = useForm({ resolver: yupResolver(taskSchema) });
 
     const dateTime = useRef<{ date: Date; time: Date }>({
         date: new Date(),
@@ -28,17 +37,7 @@ const index = () => {
     const [categoryInputOpen, setCategoryInputOpen] = useState(false);
     const [categoryValue, setCategoryValue] = useState('home');
 
-    const [task, setTask] = useState<TNewTaskForm>({
-        userId: userDetails?.id as string,
-        title: '',
-        description: '',
-        remainderAt: formateDateTime(
-            dateTime.current.date,
-            dateTime.current.time
-        ),
-        isCompleted: false,
-        category: '',
-    });
+    const [isLoading, setIsLoading] = useState<boolean>(false);
     const categories = [
         { label: 'Workout', value: 'barbell' },
         { label: 'Sports', value: 'basketball' },
@@ -50,22 +49,15 @@ const index = () => {
         { label: 'Travel', value: 'airplane' },
     ];
 
-    const handleAddTask = async () => {
+    const handleAddTask = async (data: TNewTaskForm) => {
         try {
-            await addDoc(collection(firebaseDB, 'tasks'), {
-                ...task,
-                category: categoryValue,
-                remainderAt: formateDateTime(
-                    dateTime.current.date,
-                    dateTime.current.time
-                ),
-            });
+            await addDoc(collection(firebaseDB, 'tasks'), data);
         } catch (e) {
             console.error('Error adding task: ', e);
         }
     };
 
-    const handleAddProjectTask = async () => {
+    const handleAddProjectTask = async (data: TNewTaskForm) => {
         const projectTaskRef = collection(
             firebaseDB,
             'projects',
@@ -73,34 +65,52 @@ const index = () => {
             'tasks'
         );
         try {
-            await addDoc(projectTaskRef, {
-                ...task,
-                category: categoryValue,
-                remainderAt: formateDateTime(
-                    dateTime.current.date,
-                    dateTime.current.time
-                ),
-            });
+            await addDoc(projectTaskRef, data);
         } catch (e) {
             console.error('Error adding task: ', e);
         }
     };
 
-    const handleSubmit = async () => {
+    const handleFormSubmit = async (data: {
+        title: string;
+        description?: string;
+    }) => {
+        const updatedData = {
+            ...data,
+            userId: userDetails?.id as string,
+            isCompleted: false,
+            category: categoryValue,
+            remainderAt: formateDateTime(
+                dateTime.current.date,
+                dateTime.current.time
+            ),
+        };
+
+        console.log('updatedData', updatedData);
+        setIsLoading(true);
         if (isTask) {
-            await handleAddTask();
+            await handleAddTask(updatedData);
         } else {
-            await handleAddProjectTask();
+            await handleAddProjectTask(updatedData);
             await updateNoOfTasks(projectId as string);
         }
+        setIsLoading(false);
         navigation.goBack();
     };
     return (
         <View className="px-4 pt-10 rounded-t-3xl">
-            <CustomTextInput
-                label="Task title"
-                placeholder="Enter the task title"
-                onChangeText={(e) => setTask({ ...task, title: e })}
+            <Controller
+                name="title"
+                control={control}
+                render={({ field: { value, onChange } }) => (
+                    <CustomTextInput
+                        label="Task title"
+                        placeholder="Enter the task title"
+                        value={value}
+                        onChangeText={onChange}
+                        errorMessage={errors.title?.message}
+                    />
+                )}
             />
             {isTask && (
                 <View>
@@ -124,10 +134,18 @@ const index = () => {
                     />
                 </View>
             )}
-            <CustomTextInput
-                label="Description"
-                placeholder="Enter few words of description..."
-                onChangeText={(e) => setTask({ ...task, description: e })}
+            <Controller
+                name="description"
+                control={control}
+                render={({ field: { value, onChange } }) => (
+                    <CustomTextInput
+                        label="Description"
+                        placeholder="Enter few words of description..."
+                        value={value}
+                        onChangeText={onChange}
+                        errorMessage={errors.description?.message}
+                    />
+                )}
             />
             <View className="flex flex-row justify-between my-5">
                 <View className="flex flex-row items-center gap-2">
@@ -173,7 +191,8 @@ const index = () => {
                 />
             )}
             <TouchableOpacity
-                onPress={handleSubmit}
+                onPress={handleSubmit(handleFormSubmit)}
+                disabled={isLoading}
                 className="h-10 w-28 border rounded-lg mt-5 ml-auto"
             >
                 <Text className="text-center my-auto text-lg">Add</Text>

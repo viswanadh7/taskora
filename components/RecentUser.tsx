@@ -29,8 +29,8 @@ const RecentUser = ({ user, onPress }: TRecentUser) => {
         >
             <View className="flex-row gap-2 items-start">
                 <Image
-                    style={{ height: 60, width: 60, borderRadius: 30 }}
-                    source={require('../assets/profile/profile-sample.png')}
+                    style={{ height: 50, width: 50, borderRadius: 25 }}
+                    source={require('../assets/profile/dog.png')}
                 />
                 <View className="flex-1">
                     <View className="flex-row justify-between items-center">
@@ -41,7 +41,11 @@ const RecentUser = ({ user, onPress }: TRecentUser) => {
                             {timestamp}
                         </Text>
                     </View>
-                    <Text className="text-gray-700">{user.lastMessage}</Text>
+                    <Text className="text-gray-700 mt-1">
+                        {user.lastMessage!.length > 40
+                            ? user.lastMessage?.slice(0, 40) + '...'
+                            : user.lastMessage}
+                    </Text>
                 </View>
             </View>
         </TouchableOpacity>

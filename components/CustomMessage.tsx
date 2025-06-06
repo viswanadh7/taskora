@@ -19,13 +19,20 @@ const CustomMessage = ({ message }: TCustomMessage) => {
                 style={{
                     minWidth: '30%',
                     maxWidth: '70%',
+                    paddingHorizontal: 10,
+                    paddingVertical: 8,
+                    marginTop: 10,
+                    borderTopRightRadius: 10,
+                    borderTopLeftRadius: 10,
+                    borderBottomRightRadius: isCurrentUser ? 0 : 10,
+                    borderBottomLeftRadius: isCurrentUser ? 10 : 0,
                 }}
-                className={`max-w-[50%] p-2 my-1 rounded-xl ${
-                    isCurrentUser ? 'bg-primary' : 'bg-secondary'
-                }`}
+                className={`${isCurrentUser ? 'bg-[#D9EAFD]' : 'bg-[#b8d4f0]'}`}
             >
                 <Text className="text-lg">{message.message}</Text>
-                <Text className="text-sm text-right">{timestamp}</Text>
+                <Text style={{ fontSize: 10 }} className="text-right">
+                    {timestamp}
+                </Text>
             </View>
         </View>
     );
